@@ -4,7 +4,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-class ExpressionUnitFactoryImpl implements ExpressionUnitFactory{
+public class ExpressionUnitFactoryImpl implements ExpressionUnitFactory{
 
     private Map<String,FunctionEU>          customFunctions;
     private Map<String,BinaryOperatorEU>    customBinaryOperators;
@@ -28,9 +28,9 @@ class ExpressionUnitFactoryImpl implements ExpressionUnitFactory{
 
         switch (type){
 
-            case FUNCTION        : return getLocalOrGlobalFunc(id);
-            case UNARY_OPERATOR  : return getLocalOrGlobalUnOp(id);
-            case BINARY_OPERATOR : return getLocalOrGlobalBinOp(id);
+            case FUNCTION        : return getExpressionUnit(id,customFunctions, BuiltInFunctions::getFunction,"no such function of id : " + id);
+            case UNARY_OPERATOR  : return getExpressionUnit(id,customUnaryOperators, BuiltInOperators::getUnaryOperator,"no such unary operator of id : " + id);
+            case BINARY_OPERATOR : return getExpressionUnit(id,customBinaryOperators, BuiltInOperators::getBinaryOperator,"no such binary operator of id : " + id);
             case OPERAND         :
             default              : throw new IllegalArgumentException("cannot create an ExpressionUnit of given type : " + type);
 
@@ -49,79 +49,52 @@ class ExpressionUnitFactoryImpl implements ExpressionUnitFactory{
     public Set<String> getIds(EUType type) {
 
         switch (type){
-            case FUNCTION:{
-                Set<String> funcIds = new HashSet<>();
-
-                if(customFunctions != null)
-                    funcIds.addAll(customFunctions.keySet());
-                funcIds.addAll(GlobalFunctions.getFunctionNames());
-
-                return funcIds;
-            }
-            case BINARY_OPERATOR:{
-                Set<String> binOpIds = new HashSet<>();
-
-                if(customBinaryOperators != null)
-                    binOpIds.addAll(customBinaryOperators.keySet());
-                binOpIds.addAll(GlobalOperators.getBinaryOperatorNames());
-
-                return binOpIds;
-            }
-            case UNARY_OPERATOR:{
-                Set<String> unOpIds = new HashSet<>();
-
-                if(customUnaryOperators != null)
-                    unOpIds.addAll(customUnaryOperators.keySet());
-                unOpIds.addAll(GlobalOperators.getUnaryOperatorNames());
-
-                return unOpIds;
-            }
-            default:{
-                throw new IllegalArgumentException("given Expression Unit type can't have any ids : " + type);
-            }
+            case FUNCTION         : return getIds(customFunctions      , BuiltInFunctions::getFunctionNames);
+            case BINARY_OPERATOR  : return getIds(customBinaryOperators, BuiltInOperators::getBinaryOperatorNames);
+            case UNARY_OPERATOR   : return getIds(customUnaryOperators , BuiltInOperators::getUnaryOperatorNames);
+            default               : throw new IllegalArgumentException("given Expression Unit type can't have any ids : " + type);
         }
 
     }
 
-    private ExpressionUnit getLocalOrGlobalFunc(String id){
+    private ExpressionUnit getExpressionUnit(String id,
+                                             Map<String,? extends ExpressionUnit> customExpUnitsHolder,
+                                             BuiltInExpUnitsHolder builtInExpUnitsHolder,
+                                             String excMessage)
+    {
 
-        ExpressionUnit reqFunc = null;
+        ExpressionUnit reqExpUnit = null;
 
-        if (customFunctions != null)
-            reqFunc = customFunctions.get(id);
-        if (reqFunc == null)
-            reqFunc = GlobalFunctions.getFunction(id);
-        if (reqFunc == null)
-            throw new IllegalArgumentException("no such function with id : " + id);
+        if (customExpUnitsHolder != null)
+            reqExpUnit = customExpUnitsHolder.get(id);
+        if (reqExpUnit == null)
+            reqExpUnit = builtInExpUnitsHolder.getExpUnit(id);
+        if (reqExpUnit == null)
+            throw new IllegalArgumentException(excMessage);
 
-        return reqFunc;
+        return reqExpUnit;
+
     }
 
-    private ExpressionUnit getLocalOrGlobalBinOp(String id){
+    private Set<String> getIds(Map<String,? extends ExpressionUnit> customExpUnitsHolder,
+                               BuiltInExpUnitIdsHolder builtInExpUnitIdsHolder)
+    {
 
-        ExpressionUnit binaryOp = null;
+        Set<String> ids = new HashSet<>();
 
-        if (customBinaryOperators != null)
-            binaryOp = customBinaryOperators.get(id);
-        if (binaryOp == null)
-            binaryOp = GlobalOperators.getBinaryOperator(id);
-        if (binaryOp == null)
-            throw new IllegalArgumentException("no such binary operator with id : " + id);
+        if(customExpUnitsHolder != null)
+            ids.addAll(customExpUnitsHolder.keySet());
+        ids.addAll(builtInExpUnitIdsHolder.getIds());
 
-        return binaryOp;
+        return ids;
+
     }
 
-    private ExpressionUnit getLocalOrGlobalUnOp(String id){
+    private interface BuiltInExpUnitsHolder {
+        ExpressionUnit getExpUnit(String name);
+    }
 
-        ExpressionUnit unaryOp = null;
-
-        if (customUnaryOperators != null)
-            unaryOp = customUnaryOperators.get(id);
-        if (unaryOp == null)
-            unaryOp = GlobalOperators.getUnaryOperator(id);
-        if (unaryOp == null)
-            throw new IllegalArgumentException("no such unary operator with id : " + id);
-        return unaryOp;
-
+    private interface BuiltInExpUnitIdsHolder{
+        Set<String> getIds();
     }
 }

@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-public class GlobalFunctions{
+public class BuiltInFunctions {
 
     private static Map<String,ExpressionUnit> globalFunctions = new HashMap<>();
 

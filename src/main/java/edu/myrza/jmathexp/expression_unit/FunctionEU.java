@@ -1,6 +1,6 @@
 package edu.myrza.jmathexp.expression_unit;
 
-class FunctionEU implements ExpressionUnit{
+public class FunctionEU implements ExpressionUnit{
 
     private Function impl;
     private String name;

@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-public class GlobalOperators{
+public class BuiltInOperators {
 
     public static final int ADDITION_PRECEDENCE = 500;
     public static final int SUBTRACTION_PRECEDENCE = ADDITION_PRECEDENCE;

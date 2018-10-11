@@ -1,6 +1,6 @@
 package edu.myrza.jmathexp.expression_unit;
 
-class OperandEU implements ExpressionUnit{
+public class OperandEU implements ExpressionUnit{
 
     private double value;
 

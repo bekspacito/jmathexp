@@ -1,6 +1,6 @@
 package edu.myrza.jmathexp.expression_unit;
 
-class BinaryOperatorEU implements ExpressionUnit{
+public class BinaryOperatorEU implements ExpressionUnit{
 
     private BinaryOperator impl;
     private int precedence;

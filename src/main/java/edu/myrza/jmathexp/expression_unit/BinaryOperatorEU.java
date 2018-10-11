@@ -1,17 +1,17 @@
 package edu.myrza.jmathexp.expression_unit;
 
-public class BinaryOperatorEU implements ExpressionUnit{
+class BinaryOperatorEU implements ExpressionUnit{
 
     private BinaryOperator impl;
     private int precedence;
     private String name;
 
-    private static ExpressionUnits type;
+    private static EUType type;
     private static boolean isLeftAssociative;
     private static int argc;
 
     static {
-        type = ExpressionUnits.BINARY_OPERATOR;
+        type = EUType.BINARY_OPERATOR;
         isLeftAssociative = true;
         argc = 2;
     }
@@ -45,7 +45,7 @@ public class BinaryOperatorEU implements ExpressionUnit{
         return precedence;
     }
 
-    public ExpressionUnits getType(){
+    public EUType getType(){
         return type;
     }
 

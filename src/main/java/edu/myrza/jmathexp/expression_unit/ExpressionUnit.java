@@ -10,5 +10,5 @@ public interface ExpressionUnit{
 
     boolean isLeftAssociative();
 
-    ExpressionUnits getType();
+    EUType getType();
 }

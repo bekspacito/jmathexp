@@ -6,12 +6,12 @@ public class UnaryOperatorEU implements ExpressionUnit{
     private int precedence;
     private String name;
 
-    private static ExpressionUnits type;
+    private static EUType type;
     private static boolean isLeftAssociative;
     private static int argc;
 
     static {
-        type = ExpressionUnits.UNARY_OPERATOR;
+        type = EUType.UNARY_OPERATOR;
         argc = 1;
         isLeftAssociative = true;
     }
@@ -45,7 +45,7 @@ public class UnaryOperatorEU implements ExpressionUnit{
         return precedence;
     }
 
-    public ExpressionUnits getType(){
+    public EUType getType(){
         return type;
     }
 

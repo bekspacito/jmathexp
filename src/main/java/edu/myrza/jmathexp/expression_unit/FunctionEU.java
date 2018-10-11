@@ -1,15 +1,15 @@
 package edu.myrza.jmathexp.expression_unit;
 
-public class FunctionEU implements ExpressionUnit{
+class FunctionEU implements ExpressionUnit{
 
     private Function impl;
     private String name;
     private int argc;
 
-    private static ExpressionUnits type;
+    private static EUType type;
 
     static {
-        type = ExpressionUnits.FUNCTION;
+        type = EUType.FUNCTION;
     }
 
     public FunctionEU(String name,int argc,Function impl){
@@ -41,7 +41,7 @@ public class FunctionEU implements ExpressionUnit{
         throw new UnsupportedOperationException("functions don't have precedence : " + toString());
     }
 
-    public ExpressionUnits getType(){
+    public EUType getType(){
         return type;
     }
 

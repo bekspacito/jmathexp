@@ -44,8 +44,10 @@ public class GlobalOperators{
         return globalUnaryOperators.get(name);
     }
 
-    public static Set<String> getOperatorNames(){
+    public static Set<String> getBinaryOperatorNames(){
         return globalBinaryOperators.keySet();
     }
+
+    public static Set<String> getUnaryOperatorNames(){ return globalUnaryOperators.keySet(); }
 
 }

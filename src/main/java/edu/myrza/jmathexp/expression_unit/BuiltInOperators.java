@@ -23,17 +23,17 @@ public class BuiltInOperators {
 
     static {
 
-        globalBinaryOperators.put("+",new BinaryOperatorEU("+",ADDITION_PRECEDENCE,(operand1, operand2) -> operand1 + operand2 ));
-        globalBinaryOperators.put("-",new BinaryOperatorEU("-", SUBTRACTION_PRECEDENCE,(operand1, operand2) -> operand1 - operand2 ));
+        globalBinaryOperators.put("+",new BinaryOperator("+",ADDITION_PRECEDENCE,(operand1, operand2) -> operand1 + operand2 ));
+        globalBinaryOperators.put("-",new BinaryOperator("-", SUBTRACTION_PRECEDENCE,(operand1, operand2) -> operand1 - operand2 ));
 
-        globalBinaryOperators.put("*",new BinaryOperatorEU("*",MULTIPLICATION_PRECEDENCE,(operand1, operand2) -> operand1 * operand2 ));
-        globalBinaryOperators.put("/",new BinaryOperatorEU("/",DIVISION_PRECEDENCE,(operand1, operand2) -> operand1 / operand2 ));
-        globalBinaryOperators.put("%",new BinaryOperatorEU("%",MODULO_PRECEDENCE,(operand1, operand2) -> operand1 % operand2 ));
+        globalBinaryOperators.put("*",new BinaryOperator("*",MULTIPLICATION_PRECEDENCE,(operand1, operand2) -> operand1 * operand2 ));
+        globalBinaryOperators.put("/",new BinaryOperator("/",DIVISION_PRECEDENCE,(operand1, operand2) -> operand1 / operand2 ));
+        globalBinaryOperators.put("%",new BinaryOperator("%",MODULO_PRECEDENCE,(operand1, operand2) -> operand1 % operand2 ));
 
-        globalBinaryOperators.put("^",new BinaryOperatorEU("^",POWER_PRECEDENCE,Math::pow));
+        globalBinaryOperators.put("^",new BinaryOperator("^",POWER_PRECEDENCE,Math::pow));
 
-        globalUnaryOperators.put("-",new UnaryOperatorEU("-",UNARY_MINUS_PRECEDENCE,operand -> -1*operand));
-        globalUnaryOperators.put("+",new UnaryOperatorEU("+",UNARY_PLUS_PRECEDENCE,operand -> operand < 0 ? -1*operand : operand));
+        globalUnaryOperators.put("-",new UnaryOperator("-",UNARY_MINUS_PRECEDENCE, operand -> -1*operand));
+        globalUnaryOperators.put("+",new UnaryOperator("+",UNARY_PLUS_PRECEDENCE, operand -> operand < 0 ? -1*operand : operand));
     }
 
     public static ExpressionUnit getBinaryOperator(String name){

@@ -1,16 +1,16 @@
 package edu.myrza.jmathexp.expression_unit;
 
-public class OperandEU implements ExpressionUnit{
+public class Operand implements ExpressionUnit{
 
     private double value;
 
-    private static EUType type;
+    private static ExpUnitType type;
 
     static {
-        type = EUType.OPERAND;
+        type = ExpUnitType.OPERAND;
     }
 
-    public OperandEU(double value){
+    public Operand(double value){
         this.value = value;
     }
 
@@ -30,7 +30,7 @@ public class OperandEU implements ExpressionUnit{
         throw new UnsupportedOperationException("operands don't have precedence");
     }
 
-    public EUType getType() {
+    public ExpUnitType getType() {
         return type;
     }
 }

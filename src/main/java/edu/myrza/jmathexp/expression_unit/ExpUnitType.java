@@ -1,12 +1,12 @@
 package edu.myrza.jmathexp.expression_unit;
 
-public enum EUType {
+public enum ExpUnitType {
     UNARY_OPERATOR,BINARY_OPERATOR,FUNCTION,OPERAND;
 
     @Override
     public String toString() {
 
-        String tmp = "EUType.";
+        String tmp = "ExpUnitType.";
 
         switch (this){
 

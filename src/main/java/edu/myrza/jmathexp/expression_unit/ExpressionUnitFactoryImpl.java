@@ -6,14 +6,14 @@ import java.util.Set;
 
 public class ExpressionUnitFactoryImpl implements ExpressionUnitFactory{
 
-    private Map<String,FunctionEU>          customFunctions;
-    private Map<String,BinaryOperatorEU>    customBinaryOperators;
-    private Map<String,UnaryOperatorEU>     customUnaryOperators;
+    private Map<String,Function>          customFunctions;
+    private Map<String,BinaryOperator>    customBinaryOperators;
+    private Map<String,UnaryOperator>     customUnaryOperators;
 
 
-    public ExpressionUnitFactoryImpl(Map<String,FunctionEU> customFunctions,
-                                     Map<String,BinaryOperatorEU> customBinaryOperators,
-                                     Map<String,UnaryOperatorEU> customUnaryOperators)
+    public ExpressionUnitFactoryImpl(Map<String,Function> customFunctions,
+                                     Map<String,BinaryOperator> customBinaryOperators,
+                                     Map<String,UnaryOperator> customUnaryOperators)
     {
         this.customFunctions = customFunctions;
         this.customBinaryOperators = customBinaryOperators;
@@ -24,12 +24,12 @@ public class ExpressionUnitFactoryImpl implements ExpressionUnitFactory{
      * Both global and local functions/operators are merged here
      * */
     @Override
-    public ExpressionUnit createExpressionUnit(EUType type, String id) {
+    public ExpressionUnit create(ExpUnitType type, String id) {
 
         switch (type){
 
-            case FUNCTION        : return getExpressionUnit(id,customFunctions, BuiltInFunctions::getFunction,"no such function of id : " + id);
-            case UNARY_OPERATOR  : return getExpressionUnit(id,customUnaryOperators, BuiltInOperators::getUnaryOperator,"no such unary operator of id : " + id);
+            case FUNCTION        : return getExpressionUnit(id,customFunctions,       BuiltInFunctions::getFunction,      "no such function of id : " + id);
+            case UNARY_OPERATOR  : return getExpressionUnit(id,customUnaryOperators,  BuiltInOperators::getUnaryOperator, "no such unary operator of id : " + id);
             case BINARY_OPERATOR : return getExpressionUnit(id,customBinaryOperators, BuiltInOperators::getBinaryOperator,"no such binary operator of id : " + id);
             case OPERAND         :
             default              : throw new IllegalArgumentException("cannot create an ExpressionUnit of given type : " + type);
@@ -38,15 +38,15 @@ public class ExpressionUnitFactoryImpl implements ExpressionUnitFactory{
     }
 
     @Override
-    public ExpressionUnit convertToOperand(double number) {
-       return new OperandEU(number);
+    public ExpressionUnit convert(double number) {
+       return new Operand(number);
     }
 
     /**
      * Both global and local functions/operators are merged here
      * */
     @Override
-    public Set<String> getIds(EUType type) {
+    public Set<String> getIds(ExpUnitType type) {
 
         switch (type){
             case FUNCTION         : return getIds(customFunctions      , BuiltInFunctions::getFunctionNames);

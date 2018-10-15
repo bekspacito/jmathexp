@@ -18,11 +18,11 @@ public class TestExpressionUnitFactory{
     @BeforeClass
     public static void init(){
 
-        Map<String,FunctionEU> customFunctions = new HashMap<>();
-        customFunctions.put("arcsin",new FunctionEU("arcsin",1,args ->  Math.asin(args[0]) ));
+        Map<String,Function> customFunctions = new HashMap<>();
+        customFunctions.put("arcsin",new Function("arcsin",1, args ->  Math.asin(args[0]) ));
 
-        Map<String,UnaryOperatorEU> customUnaryOperators = new HashMap<>();
-        customUnaryOperators.put("!",new UnaryOperatorEU("!",BuiltInOperators.POWER_PRECEDENCE + 1,arg -> {
+        Map<String,UnaryOperator> customUnaryOperators = new HashMap<>();
+        customUnaryOperators.put("!",new UnaryOperator("!",BuiltInOperators.POWER_PRECEDENCE + 1, arg -> {
 
             if(arg % 1 != 0) throw new IllegalArgumentException("! operand must be integer...");
             if(arg <= 0)     throw new IllegalArgumentException("fact defined only for values above zero....");
@@ -48,7 +48,7 @@ public class TestExpressionUnitFactory{
     @Test
     public void testOne(){
 
-        ExpressionUnit fact = factory.createExpressionUnit(EUType.UNARY_OPERATOR,"!");
+        ExpressionUnit fact = factory.create(ExpUnitType.UNARY_OPERATOR,"!");
 
         assertNotNull(fact);
 
@@ -64,13 +64,29 @@ public class TestExpressionUnitFactory{
     @Test
     public void testTwo(){
 
-        ExpressionUnit arcsin = factory.createExpressionUnit(EUType.FUNCTION,"arcsin");
+        ExpressionUnit arcsin = factory.create(ExpUnitType.FUNCTION,"arcsin");
 
         assertNotNull(arcsin);
 
         double result = Math.toDegrees(arcsin.evaluate(1));
 
         assertEquals(90.0,result,0.0);
+
+    }
+
+    /**
+     * Returns and executes addition
+     * */
+    @Test
+    public void testThree(){
+
+        ExpressionUnit add = factory.create(ExpUnitType.BINARY_OPERATOR,"+");
+
+        assertNotNull(add);
+
+        double result = add.evaluate(13,17);
+
+        assertEquals(30.0,result,0.0);
 
     }
 

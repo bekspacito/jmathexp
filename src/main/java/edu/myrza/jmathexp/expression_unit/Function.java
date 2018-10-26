@@ -3,7 +3,7 @@ package edu.myrza.jmathexp.expression_unit;
 public class Function implements ExpressionUnit{
 
     private Action impl;
-    private String name;
+    private String token;
     private int argc;
 
     private static ExpUnitType type;
@@ -12,10 +12,10 @@ public class Function implements ExpressionUnit{
         type = ExpUnitType.FUNCTION;
     }
 
-    public Function(String name, int argc, Action impl){
+    public Function(String token, int argc, Action impl){
 
         this.impl = impl;
-        this.name = name;
+        this.token = token;
         this.argc = argc;
 
     }
@@ -48,7 +48,7 @@ public class Function implements ExpressionUnit{
     @Override
     public String toString() {
         return "Function{" +
-                "name='" + name + '\'' +
+                "token='" + token + '\'' +
                 '}';
     }
 }

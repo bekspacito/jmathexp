@@ -29,7 +29,7 @@ public class TestExpressionUnitFactory{
     public void testCustomBinOp(){
 
         ExpressionUnitFactory factory = new ExpressionUnitFactoryImpl.Builder()
-                .addBinaryOperator("<<",POWER_PRECEDENCE + 1,(op1,op2) -> {
+                .addBinaryOperator("<<",true,POWER_PRECEDENCE + 1,(op1,op2) -> {
 
                     int intOp1 = (int)op1;
                     int intOp2 = (int)op2;
@@ -51,7 +51,7 @@ public class TestExpressionUnitFactory{
     public void testCustomUnaryOp(){
 
         ExpressionUnitFactory factory = new ExpressionUnitFactoryImpl.Builder()
-                  .addUnaryOperator("!",POWER_PRECEDENCE + 1,arg -> {
+                  .addUnaryOperator("!",true,POWER_PRECEDENCE + 1,arg -> {
 
                       int intArg = (int)arg;
 

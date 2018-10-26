@@ -1,5 +1,6 @@
 package edu.myrza.jmathexp.expression_unit;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -11,13 +12,64 @@ public class ExpressionUnitFactoryImpl implements ExpressionUnitFactory{
     private Map<String,UnaryOperator>     customUnaryOperators;
 
 
-    public ExpressionUnitFactoryImpl(Map<String,Function> customFunctions,
-                                     Map<String,BinaryOperator> customBinaryOperators,
-                                     Map<String,UnaryOperator> customUnaryOperators)
+    private ExpressionUnitFactoryImpl(Builder builder)
     {
-        this.customFunctions = customFunctions;
-        this.customBinaryOperators = customBinaryOperators;
-        this.customUnaryOperators = customUnaryOperators;
+        this.customFunctions       = builder.customFunctions;
+        this.customBinaryOperators = builder.customBinaryOperators;
+        this.customUnaryOperators  = builder.customUnaryOperators;
+    }
+
+    public static class Builder{
+
+        private Map<String,Function>       customFunctions;
+        private Map<String,BinaryOperator> customBinaryOperators;
+        private Map<String,UnaryOperator>  customUnaryOperators;
+
+        public Builder addFunction(String token,int argc,Action impl){
+
+            if(token == null || token.equals("")) throw new IllegalArgumentException("token cannot be null or empty string....");
+            if(argc <= 0)                         throw new IllegalArgumentException("argument amount cannot be less or equal zero....");
+            if(impl == null)                      throw new IllegalArgumentException("math action itself didn't been supplied....");
+
+            if(customFunctions == null)
+                customFunctions = new HashMap<>();
+
+            customFunctions.put(token,new Function(token,argc,impl));
+
+            return this;
+        }
+
+        public Builder addUnaryOperator(String token,boolean isLeftAssociative,int precedence,UnaryAction unaryAction){
+
+            if(token == null || token.equals("")) throw new IllegalArgumentException("token cannot be null or empty string....");
+            if(precedence <= 0)                         throw new IllegalArgumentException("precedence cannot be less or equal zero....");
+            if(unaryAction == null)                      throw new IllegalArgumentException("math unary action itself didn't been supplied....");
+
+            if(customUnaryOperators == null)
+                customUnaryOperators = new HashMap<>();
+
+            customUnaryOperators.put(token,new UnaryOperator(token,isLeftAssociative,precedence,unaryAction));
+
+            return this;
+
+        }
+
+        public Builder addBinaryOperator(String token,boolean isLeftAssociative,int precedence,BinaryAction binaryAction){
+
+            if(token == null || token.equals("")) throw new IllegalArgumentException("token cannot be null or empty string....");
+            if(precedence <= 0)                         throw new IllegalArgumentException("precedence cannot be less or equal zero....");
+            if(binaryAction == null)                      throw new IllegalArgumentException("math binary action itself didn't been supplied....");
+
+            if(customBinaryOperators == null)
+                customBinaryOperators = new HashMap<>();
+
+            customBinaryOperators.put(token,new BinaryOperator(token,isLeftAssociative,precedence,binaryAction));
+
+            return this;
+        }
+
+        public ExpressionUnitFactory build(){ return new ExpressionUnitFactoryImpl(this); }
+
     }
 
     /**

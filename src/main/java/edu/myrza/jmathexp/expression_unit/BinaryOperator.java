@@ -5,19 +5,20 @@ public class BinaryOperator implements ExpressionUnit{
     private BinaryAction impl;
     private int precedence;
     private String name;
+    private boolean isLeftAssociative;
 
     private static ExpUnitType type;
-    private static boolean isLeftAssociative;
+
     private static int argc;
 
     static {
         type = ExpUnitType.BINARY_OPERATOR;
-        isLeftAssociative = true;
         argc = 2;
     }
 
-    public BinaryOperator(String name, int precedence, BinaryAction impl){
+    public BinaryOperator(String name,boolean isLeftAssociative,int precedence, BinaryAction impl){
 
+        this.isLeftAssociative = isLeftAssociative;
         this.name = name;
         this.precedence = precedence;
         this.impl = impl;

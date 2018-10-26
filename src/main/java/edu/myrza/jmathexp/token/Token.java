@@ -5,7 +5,10 @@ import edu.myrza.jmathexp.expression_unit.ExpressionUnit;
 public class Token{
 
     public enum Type{
-            UNARY_OPERATOR,
+            START, // [ symbol that represents zero symbol and
+            END,   // ] symbol that represents expression closing symbol  e.g. [-4+3!]
+            RS_UNARY_OPERATOR,
+            LS_UNARY_OPERATOR,
             BINARY_OPERATOR,
             FUNCTION,
             FUNCTION_ARG_SEPARATOR,
@@ -26,4 +29,21 @@ public class Token{
         this.type = type;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Token token1 = (Token) o;
+
+        if (type != token1.type) return false;
+        return token != null ? token.equals(token1.token) : token1.token == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = type != null ? type.hashCode() : 0;
+        result = 31 * result + (token != null ? token.hashCode() : 0);
+        return result;
+    }
 }

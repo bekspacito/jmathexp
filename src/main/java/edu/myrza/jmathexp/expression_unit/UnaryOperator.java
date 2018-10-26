@@ -5,19 +5,19 @@ public class UnaryOperator implements ExpressionUnit{
     private UnaryAction impl;
     private int precedence;
     private String name;
+    private boolean isLeftAssociative;
 
     private static ExpUnitType type;
-    private static boolean isLeftAssociative;
     private static int argc;
 
     static {
         type = ExpUnitType.UNARY_OPERATOR;
         argc = 1;
-        isLeftAssociative = true;
     }
 
-    public UnaryOperator(String name, int precedence, UnaryAction impl){
+    public UnaryOperator(String name,boolean isLeftAssociative, int precedence, UnaryAction impl){
 
+        this.isLeftAssociative = isLeftAssociative;
         this.impl = impl;
         this.name = name;
         this.precedence = precedence;

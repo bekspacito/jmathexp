@@ -18,7 +18,7 @@ public class BuiltInFunctions {
 
         globalFunctions.put("log10",new Function("log10",1, args -> Math.log10(args[0])));
 
-        globalFunctions.put("log2",new Function("abs",1, args -> Math.log(args[0])/Math.log(2)));
+        globalFunctions.put("log2",new Function("log2",1, args -> Math.log(args[0])/Math.log(2)));
 
         globalFunctions.put("sin",new Function("sin",1, args -> Math.sin(args[0])));
 

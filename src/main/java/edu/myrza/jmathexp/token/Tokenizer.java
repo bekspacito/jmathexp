@@ -1,195 +1,252 @@
 package edu.myrza.jmathexp.token;
 
+import edu.myrza.jmathexp.expression_unit.ExpUnitType;
+import edu.myrza.jmathexp.expression_unit.ExpressionUnitFactory;
+
 import java.util.*;
 import java.util.stream.Stream;
 
 import static java.util.Comparator.*;
 import static edu.myrza.jmathexp.token.Token.*;
 import static java.util.Arrays.*;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 
-//todo change Tokenizer constructor so that it receives
+//todo Handle errors
+//todo change Tokenizer constructor so that it receives an Informator
+//todo function names have to be sorted decreasingly by length
+//todo RSO names have to be sorted decreasingly by priority of RSO operations
+//todo LSO operations have to be sorted increasingly by priority of LSO operations
 
 public class Tokenizer{
 
-    private Map<Token.Type,Set<String>> instanceNamesOfType;
-    private Map<Token.Type,List<NextTokenEvaluator>> nextTokenEvaluators;
+    private ExpressionUnitFactory factory;
+    private final Set<String> functions;
+    private final Set<String> binOpNames;
+    private final Set<String> rsOpNames;
+    private final Set<String> lsOpNames;
+    private Map<Type,List<Type>> neighboursAllowedTypes;
 
-    public Tokenizer(Set<String> functionNames,
-                     Set<String> binOpName,
-                     Set<String> rightSideUnOpNames,
-                     Set<String> leftSideUnOpNames)
-    {
-        if (functionNames == null || binOpName == null || rightSideUnOpNames == null || leftSideUnOpNames == null)
-            throw new IllegalArgumentException("tokenizer cannot have null sets....");
 
-            instanceNamesOfType = new HashMap<>();
-            instanceNamesOfType.put(Type.FUNCTION,functionNames);
-            instanceNamesOfType.put(Type.BINARY_OPERATOR,binOpName);
-            instanceNamesOfType.put(Type.RS_UNARY_OPERATOR,rightSideUnOpNames);
-            instanceNamesOfType.put(Type.LS_UNARY_OPERATOR,leftSideUnOpNames);
+    public Tokenizer(ExpressionUnitFactory factory){
+        this.factory = factory;
 
-            NextTokenEvaluator number = this::evaluateNumber;
-            NextTokenEvaluator rso    = this::evaluateRSO;
-            NextTokenEvaluator lso    = this::evaluateLSO;
-            NextTokenEvaluator bo     = this::evaluateBO;
-            NextTokenEvaluator func   = this::evaluateFunction;
-            NextTokenEvaluator openP  = this::evaluateOpenParentheses;
-            NextTokenEvaluator closeP = this::evaluateCloseParentheses;
-            NextTokenEvaluator sep    = this::evaluateSeparator;
-            NextTokenEvaluator end    = this::evaluateEnd;
+        functions = factory.getIds(ExpUnitType.FUNCTION);
+        binOpNames    = factory.getIds(ExpUnitType.BINARY_OPERATOR);
 
-            nextTokenEvaluators = new HashMap<>();
+        rsOpNames = factory.getIds(ExpUnitType.UNARY_OPERATOR).stream()
+                .filter(eu -> factory.create(ExpUnitType.UNARY_OPERATOR,eu).isLeftAssociative())
+                .collect(toSet());
 
-            nextTokenEvaluators.put(Type.START,                    asList(number,lso,func,openP));
-            nextTokenEvaluators.put(Type.LS_UNARY_OPERATOR,        asList(number,lso,func,openP));
-            nextTokenEvaluators.put(Type.BINARY_OPERATOR,          asList(number,lso,func,openP));
-            nextTokenEvaluators.put(Type.OPEN_PARENTHESES,         asList(number,lso,func,openP));
-            nextTokenEvaluators.put(Type.FUNCTION_ARG_SEPARATOR,   asList(number,lso,func,openP));
-            nextTokenEvaluators.put(Type.OPERAND,                  asList(rso,bo,closeP,sep,end));
-            nextTokenEvaluators.put(Type.RS_UNARY_OPERATOR,        asList(rso,bo,closeP,sep,end));
-            nextTokenEvaluators.put(Type.CLOSE_PARENTHESES,        asList(rso,bo,closeP,sep,end));
-            nextTokenEvaluators.put(Type.FUNCTION,                 asList(openP));
+        lsOpNames = factory.getIds(ExpUnitType.UNARY_OPERATOR).stream()
+                .filter(eu -> !factory.create(ExpUnitType.UNARY_OPERATOR,eu).isLeftAssociative())
+                .collect(toSet());
 
+        neighboursAllowedTypes = new HashMap<>();
+
+        neighboursAllowedTypes.put(Type.START,                  asList(Type.OPERAND,Type.LS_UNARY_OPERATOR,Type.FUNCTION,Type.OPEN_PARENTHESES));
+        neighboursAllowedTypes.put(Type.LS_UNARY_OPERATOR,      asList(Type.OPERAND,Type.LS_UNARY_OPERATOR,Type.FUNCTION,Type.OPEN_PARENTHESES));
+        neighboursAllowedTypes.put(Type.BINARY_OPERATOR,        asList(Type.OPERAND,Type.LS_UNARY_OPERATOR,Type.FUNCTION,Type.OPEN_PARENTHESES));
+        neighboursAllowedTypes.put(Type.OPEN_PARENTHESES,       asList(Type.OPERAND,Type.LS_UNARY_OPERATOR,Type.FUNCTION,Type.OPEN_PARENTHESES));
+        neighboursAllowedTypes.put(Type.FUNCTION_ARG_SEPARATOR, asList(Type.OPERAND,Type.LS_UNARY_OPERATOR,Type.FUNCTION,Type.OPEN_PARENTHESES));
+
+        neighboursAllowedTypes.put(Type.OPERAND,                asList(Type.RS_UNARY_OPERATOR,Type.BINARY_OPERATOR,Type.CLOSE_PARENTHESES,Type.FUNCTION_ARG_SEPARATOR,Type.END));
+        neighboursAllowedTypes.put(Type.RS_UNARY_OPERATOR,      asList(Type.RS_UNARY_OPERATOR,Type.BINARY_OPERATOR,Type.CLOSE_PARENTHESES,Type.FUNCTION_ARG_SEPARATOR,Type.END));
+        neighboursAllowedTypes.put(Type.CLOSE_PARENTHESES,      asList(Type.RS_UNARY_OPERATOR,Type.BINARY_OPERATOR,Type.CLOSE_PARENTHESES,Type.FUNCTION_ARG_SEPARATOR,Type.END));
+
+        neighboursAllowedTypes.put(Type.FUNCTION,               asList(Type.OPEN_PARENTHESES));
     }
 
-    //todo then check here
     public List<Token> tokenize(String exp){
 
-        if(exp == null || exp.isEmpty()) throw new IllegalArgumentException("WTF man?? Get that nasty-ass shit out of my face!!!!!...");
+        if(exp == null || exp.isEmpty())
+            throw new IllegalArgumentException("the math expression can neither be null nor be empty string...");
 
-        exp = exp.trim().replaceAll("\\s+","");
+        LexicalAnalizer tokenSupplier = new LexicalAnalizer(exp,functions,rsOpNames,lsOpNames,binOpNames);
+        List<Token> output = new LinkedList<>();
+        Token current = new Token(Type.START,"[");
+        List<Token> possibleNeighbours = null;
+        NeighbourSeekingResult result = null;
 
-        List<Token> result = tokenizeOne(exp);
+        while (tokenSupplier.hasNext()){
+            possibleNeighbours = tokenSupplier.next();
+            result = findNeighbour(possibleNeighbours, neighboursAllowedTypes.get(current.type));
 
-        return result;
-    }
-
-    //todo then here
-    private List<Token> tokenizeOne(String exp){
-
-        Integer p = 0; //the amount of processed chars in the exp
-        Token prev = new Token(Type.START,"[");
-        Token next;
-        Scanner in = new Scanner(exp + "]");
-        in.useLocale(Locale.US);
-        List<Token> result = new ArrayList<>();
-        boolean isNextFound;
-
-        //tokenize code
-        while (p <= exp.length()){
-
-            final int finalP = p;
-            Optional<NextTokenEvaluationResult> optRes = nextTokenEvaluators.get(prev.type).stream()
-                                                                                           .map(nextTokenEvaluator -> nextTokenEvaluator.ev(in,exp,finalP))
-                                                                                           .filter(nteResult -> nteResult.isSuccessful)
-                                                                                           .findFirst();
-
-            if(optRes.isPresent() && optRes.get().isSuccessful){
-                p = optRes.get().newPointer;
-                result.add(prev);
-                prev = optRes.get().evaluatedToken;
-                continue;
+            if(!result.isNeighborFound && current.type == Type.RS_UNARY_OPERATOR){
+                //change RSO to BO if possible and try to find neighbour again
+                String currentToken = current.token;
+                if(binOpNames.stream().anyMatch(bo -> bo.equals(currentToken))){
+                    current = new Token(Type.BINARY_OPERATOR,currentToken);
+                    result = findNeighbour(possibleNeighbours, neighboursAllowedTypes.get(current.type));
+                }
             }
 
-            String prevToken = prev.token;
-
-            if(prev.type.equals(Token.Type.RS_UNARY_OPERATOR)
-               && instanceNamesOfType.get(Token.Type.BINARY_OPERATOR).stream().anyMatch(n -> n.equals(prevToken)))
-            {
-                prev = new Token(Type.BINARY_OPERATOR, prevToken);
-                continue;
+            if(!result.isNeighborFound) {
+                throw new NoSuitableNeighborException(exp, current.token, possibleNeighbours.get(0).token);
             }
 
-            //todo handle errors here
+            output.add(current);
+            current = result.suitNeighbor;
+        }
+
+        output.remove(0);
+        return output;
+
+    }
+
+    NeighbourSeekingResult findNeighbour(List<Token> possibleNeighbors, List<Type> neighborsAllowedTypes){
+
+        Optional<Token> neighbor = possibleNeighbors.stream()
+                                          .filter(t -> neighborsAllowedTypes.contains(t.type))
+                                          .findFirst();
+        if(neighbor.isPresent())
+            return new NeighbourSeekingResult(true,neighbor.get());
+
+        return new NeighbourSeekingResult(false,null);
+    }
+
+    public static class LexicalAnalizer{
+
+        private Scanner scanner;
+        private int pointer;
+        private String exp;
+        private List<String> functions;
+        private Set<String> rsOperators;
+        private Set<String> lsOperators;
+        private Set<String> binaryOperators;
+
+        private List<String> operators;
+        private List<Token>  reserveSymbols;
+
+        public LexicalAnalizer(String exp,Set<String> functions,
+                                           Set<String> rsOperators,
+                                           Set<String> lsOperators,
+                                           Set<String> binaryOperators)
+        {
+
+            this.exp = exp.replaceAll("\\s+","") + "]";
+            scanner = new Scanner(this.exp);
+            pointer = 0;
+
+            this.binaryOperators = binaryOperators;
+            this.rsOperators = rsOperators;
+            this.lsOperators = lsOperators;
+
+            //we sorted an operators and functions by length scanner order to apply LONGEST MATCHING RULE
+            this.functions = functions.stream()
+                                      .sorted(comparingInt(String::length).reversed())
+                                      .collect(toList());
+
+             operators = Stream.of(rsOperators,lsOperators,binaryOperators)
+                              .flatMap(Set::stream)
+                              .distinct()
+                              .sorted(comparingInt(String::length).reversed())
+                              .collect(toList());
+
+
+
+             reserveSymbols = asList(new Token(Type.OPEN_PARENTHESES,"("),
+                                     new Token(Type.CLOSE_PARENTHESES,")"),
+                                     new Token(Type.FUNCTION_ARG_SEPARATOR,","),
+                                     new Token(Type.END,"]"));
+
+
 
         }
 
-        result.remove(0);
-        in.close();
+        public boolean hasNext(){ return pointer < exp.length(); }
+
+        public List<Token> next(){
+
+            if(pointer >= exp.length())
+                throw new NoSuchElementException("no tokens left....");
+
+            List<Token> result = new ArrayList<>();
+            String nextTokenStr = null;
+
+            //is operand
+            if(Character.isDigit(exp.charAt(pointer))) {
+                nextTokenStr = scanner.findInLine("([0-9]+(\\.[0-9]+)?|\\.[0-9]+)");
+                pointer += nextTokenStr.length();
+                result.add(new Token(Type.OPERAND,nextTokenStr));
+                return result;
+            }
+
+            //is findFunction todo or variable
+            if(Character.isLetter(exp.charAt(pointer))) {
+                nextTokenStr = findFunction().get();
+                pointer += nextTokenStr.length();
+                result.add(new Token(Type.FUNCTION,nextTokenStr));
+                return result;
+            }
+
+            //is findOperator
+            Optional<String> res = findOperator();
+            if(res.isPresent()) {
+                pointer += res.get().length();
+                return getMatchedTokens(res.get());
+            }
 
 
-        return result;
+            //is reversed symbols
+            Optional<Token> resToken = reserveSymbols.stream()
+                    .filter(t -> scanner.findWithinHorizon("\\Q" + t.token + "\\E",t.token.length()) != null)
+                    .findFirst();
 
-    }
+            if(resToken.isPresent()){
+                pointer += resToken.get().token.length();
+                result.add(resToken.get());
+                return result;
+            }
 
-    private NextTokenEvaluationResult evaluateNumber(Scanner in, String exp, int pointer){
-        if(Character.isDigit(exp.charAt(pointer))){
-            String res = in.findInLine("([0-9]+(\\.[0-9]+)?|\\.[0-9]+)");
-            pointer += res.length();
-            return new NextTokenEvaluationResult(true,new Token(Type.OPERAND,res),pointer);
+            throw new NoSuchTokenException(exp,pointer);
         }
-        return new NextTokenEvaluationResult(false,null,pointer);
-    }
 
-    private NextTokenEvaluationResult evaluateLSO(Scanner in,String exp,int pointer){
-        return evaluateNextTokenOf(Type.LS_UNARY_OPERATOR,in,exp,pointer);
-    }
+        private List<Token> getMatchedTokens(String nextTokenStr){
 
-    private NextTokenEvaluationResult evaluateRSO(Scanner in,String exp,int pointer){
-        return evaluateNextTokenOf(Type.RS_UNARY_OPERATOR,in,exp,pointer);
-    }
+            List<Token> result = new ArrayList<>();
 
-    private NextTokenEvaluationResult evaluateBO(Scanner in,String exp,int pointer){
-        return evaluateNextTokenOf(Type.BINARY_OPERATOR,in,exp,pointer);
-    }
+            if(rsOperators.stream().anyMatch(str -> str.equals(nextTokenStr)))
+                result.add(new Token(Type.RS_UNARY_OPERATOR,nextTokenStr));
+            if(lsOperators.stream().anyMatch(str -> str.equals(nextTokenStr)))
+                result.add(new Token(Type.LS_UNARY_OPERATOR,nextTokenStr));
+            if(binaryOperators.stream().anyMatch(str -> str.equals(nextTokenStr)))
+                result.add(new Token(Type.BINARY_OPERATOR,nextTokenStr));
 
-    private NextTokenEvaluationResult evaluateFunction(Scanner in,String exp,int pointer){
-        return evaluateNextTokenOf(Type.FUNCTION,in,exp,pointer);
-    }
-
-    private NextTokenEvaluationResult evaluateOpenParentheses(Scanner in,String exp,int pointer){
-        return evaluateReversedSymbol(in,pointer,"(",Type.OPEN_PARENTHESES);
-    }
-
-    private NextTokenEvaluationResult evaluateCloseParentheses(Scanner in,String exp,int pointer){
-        return evaluateReversedSymbol(in,pointer,")",Type.CLOSE_PARENTHESES);
-    }
-
-    private NextTokenEvaluationResult evaluateSeparator(Scanner in,String exp,int pointer){
-        return evaluateReversedSymbol(in,pointer,",",Type.FUNCTION_ARG_SEPARATOR);
-    }
-
-    private NextTokenEvaluationResult evaluateEnd(Scanner in,String exp,int pointer){
-        return evaluateReversedSymbol(in,pointer,"]",Type.END);
-    }
-
-    private NextTokenEvaluationResult evaluateReversedSymbol(Scanner in,int pointer,String symbol,Token.Type type){
-        if(in.findWithinHorizon("\\Q" + symbol + "\\E",1) != null){
-            return new NextTokenEvaluationResult(true,new Token(type,symbol),pointer + 1);
+            return result;
         }
-        return new NextTokenEvaluationResult(false,null,pointer);
-    }
 
-    private NextTokenEvaluationResult evaluateNextTokenOf(Token.Type t,Scanner in,String exp,int pointer){
-
-        Optional<String> optRes = instanceNamesOfType.get(t).stream()
-                                                            .sorted(comparingInt(String::length).reversed())//todo remove this sorting operation
-                                                            .filter(n -> in.findWithinHorizon("\\Q" + n + "\\E",n.length()) != null)
-                                                            .findFirst();
-        if(optRes.isPresent()){
-            pointer += optRes.get().length();
-            return new NextTokenEvaluationResult(true,new Token(t,optRes.get()),pointer);
+        private Optional<String> findOperator(){
+            return operators.stream()
+                            .filter(str -> scanner.findWithinHorizon("\\Q" + str + "\\E",str.length()) != null)
+                            .findFirst();
         }
-        return new NextTokenEvaluationResult(false,null,pointer);
+
+        private Optional<String> findFunction(){
+            return functions.stream()
+                            .filter(str -> scanner.findWithinHorizon("\\Q" + str + "\\E",str.length()) != null)
+                            .findFirst();
+
+        }
+
+        public void finalize(){
+            scanner.close();
+        }
 
     }
 
-    private interface NextTokenEvaluator{
-
-        NextTokenEvaluationResult ev(Scanner in,String exp,int pointer);
-
+    private interface NeighborSeeker {
+        NeighbourSeekingResult find(List<Token> possibleNeighbors, List<Type> neighborsAllowedTypes);
     }
 
-    private class NextTokenEvaluationResult{
+    private class NeighbourSeekingResult {
 
-        public final boolean isSuccessful;
-        public final Token evaluatedToken;
-        public final int newPointer;
+        public final boolean isNeighborFound;
+        public final Token suitNeighbor;
 
-        public NextTokenEvaluationResult(boolean isSuccessful, Token evaluatedToken,int newPointer) {
-            this.isSuccessful = isSuccessful;
-            this.evaluatedToken = evaluatedToken;
-            this.newPointer = newPointer;
+        public NeighbourSeekingResult(boolean isNeighborFound, Token suitNeighbor) {
+            this.isNeighborFound = isNeighborFound;
+            this.suitNeighbor = suitNeighbor;
         }
     }
 

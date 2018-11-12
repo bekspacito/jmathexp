@@ -14,8 +14,27 @@ public class Token{
             FUNCTION_ARG_SEPARATOR,
             OPERAND,
             OPEN_PARENTHESES,
-            CLOSE_PARENTHESES
+            CLOSE_PARENTHESES;
+
+        @Override
+        public String toString() {
+
+            switch (this){
+                case START : return  "START";
+                case END   : return  "END";
+                case RS_UNARY_OPERATOR: return "RS_UNARY_OPERATOR";
+                case LS_UNARY_OPERATOR: return "LS_UNARY_OPERATOR";
+                case FUNCTION: return "FUNCTION";
+                case FUNCTION_ARG_SEPARATOR: return "FUNCTION_ARG_SEP";
+                case BINARY_OPERATOR:return "BINARY_OPERATOR";
+                case OPERAND: return "OPERAND";
+                case OPEN_PARENTHESES: return "OPEN_PARENTHESES";
+                case CLOSE_PARENTHESES:return "CLOSE_PARENTHESES";
+                    default : return null;
+            }
+
         }
+    }
 
     public final Type type;
     public final String token;
@@ -27,6 +46,14 @@ public class Token{
 
         this.token = token;
         this.type = type;
+    }
+
+    @Override
+    public String toString() {
+        return "Token{" +
+                "type=" + type +
+                ", token='" + token + '\'' +
+                '}';
     }
 
     @Override

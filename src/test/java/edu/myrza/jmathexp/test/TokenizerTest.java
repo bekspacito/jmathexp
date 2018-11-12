@@ -36,11 +36,12 @@ public class TokenizerTest {
         Set<String> rightSideUnOpNames = factory.getIds(ExpUnitType.UNARY_OPERATOR).stream()
                                                                                    .filter(eu -> factory.create(ExpUnitType.UNARY_OPERATOR,eu).isLeftAssociative())
                                                                                    .collect(toSet());
+
         Set<String> leftSideUnOpNames = factory.getIds(ExpUnitType.UNARY_OPERATOR).stream()
                                                                                   .filter(eu -> !factory.create(ExpUnitType.UNARY_OPERATOR,eu).isLeftAssociative())
                                                                                   .collect(toSet());
 
-        tokenizer = new Tokenizer(functionNames,binOpNames,rightSideUnOpNames,leftSideUnOpNames);
+        tokenizer = new Tokenizer(factory);
     }
 
     @Test

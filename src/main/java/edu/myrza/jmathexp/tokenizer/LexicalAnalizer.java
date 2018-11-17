@@ -9,7 +9,7 @@ import static java.util.Arrays.asList;
 import static java.util.Comparator.comparingInt;
 import static java.util.stream.Collectors.toList;
 
-class LexicalAnalizer{
+public class LexicalAnalizer{
 
         private Scanner scanner;
         private int pointer;

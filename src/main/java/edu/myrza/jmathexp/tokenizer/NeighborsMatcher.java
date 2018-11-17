@@ -23,15 +23,18 @@ class NeighborsMatcher{
 
     static {
 
-        neighboursAllowedTypes.put(Token.Type.START,                  asList(Token.Type.OPERAND, Token.Type.LS_UNARY_OPERATOR, Token.Type.FUNCTION, Token.Type.OPEN_PARENTHESES));
-        neighboursAllowedTypes.put(Token.Type.LS_UNARY_OPERATOR,      asList(Token.Type.OPERAND, Token.Type.LS_UNARY_OPERATOR, Token.Type.FUNCTION, Token.Type.OPEN_PARENTHESES));
-        neighboursAllowedTypes.put(Token.Type.BINARY_OPERATOR,        asList(Token.Type.OPERAND, Token.Type.LS_UNARY_OPERATOR, Token.Type.FUNCTION, Token.Type.OPEN_PARENTHESES));
-        neighboursAllowedTypes.put(Token.Type.OPEN_PARENTHESES,       asList(Token.Type.OPERAND, Token.Type.LS_UNARY_OPERATOR, Token.Type.FUNCTION, Token.Type.OPEN_PARENTHESES));
-        neighboursAllowedTypes.put(Token.Type.FUNCTION_ARG_SEPARATOR, asList(Token.Type.OPERAND, Token.Type.LS_UNARY_OPERATOR, Token.Type.FUNCTION, Token.Type.OPEN_PARENTHESES));
+        List<Token.Type> allowTypesSetOne = asList(Token.Type.OPERAND, Token.Type.LS_UNARY_OPERATOR, Token.Type.FUNCTION, Token.Type.OPEN_PARENTHESES);
+        List<Token.Type> allowTypesSetTwo = asList(Token.Type.RS_UNARY_OPERATOR, Token.Type.BINARY_OPERATOR, Token.Type.CLOSE_PARENTHESES, Token.Type.FUNCTION_ARG_SEPARATOR, Token.Type.END);
 
-        neighboursAllowedTypes.put(Token.Type.OPERAND,                asList(Token.Type.RS_UNARY_OPERATOR, Token.Type.BINARY_OPERATOR, Token.Type.CLOSE_PARENTHESES, Token.Type.FUNCTION_ARG_SEPARATOR, Token.Type.END));
-        neighboursAllowedTypes.put(Token.Type.RS_UNARY_OPERATOR,      asList(Token.Type.RS_UNARY_OPERATOR, Token.Type.BINARY_OPERATOR, Token.Type.CLOSE_PARENTHESES, Token.Type.FUNCTION_ARG_SEPARATOR, Token.Type.END));
-        neighboursAllowedTypes.put(Token.Type.CLOSE_PARENTHESES,      asList(Token.Type.RS_UNARY_OPERATOR, Token.Type.BINARY_OPERATOR, Token.Type.CLOSE_PARENTHESES, Token.Type.FUNCTION_ARG_SEPARATOR, Token.Type.END));
+        neighboursAllowedTypes.put(Token.Type.START,                  allowTypesSetOne);
+        neighboursAllowedTypes.put(Token.Type.LS_UNARY_OPERATOR,      allowTypesSetOne);
+        neighboursAllowedTypes.put(Token.Type.BINARY_OPERATOR,        allowTypesSetOne);
+        neighboursAllowedTypes.put(Token.Type.OPEN_PARENTHESES,       allowTypesSetOne);
+        neighboursAllowedTypes.put(Token.Type.FUNCTION_ARG_SEPARATOR, allowTypesSetOne);
+
+        neighboursAllowedTypes.put(Token.Type.OPERAND,                allowTypesSetTwo);
+        neighboursAllowedTypes.put(Token.Type.RS_UNARY_OPERATOR,      allowTypesSetTwo);
+        neighboursAllowedTypes.put(Token.Type.CLOSE_PARENTHESES,      allowTypesSetTwo);
 
         neighboursAllowedTypes.put(Token.Type.FUNCTION,               asList(Token.Type.OPEN_PARENTHESES));
 

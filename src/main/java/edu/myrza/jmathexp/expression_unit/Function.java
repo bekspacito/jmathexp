@@ -48,7 +48,7 @@ public class Function implements ExpressionUnit{
     @Override
     public String toString() {
         return "Function{" +
-                "token='" + token + '\'' +
+                "tokenizer='" + token + '\'' +
                 '}';
     }
 }

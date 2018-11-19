@@ -1,6 +1,4 @@
-package edu.myrza.jmathexp.token;
-
-import edu.myrza.jmathexp.expression_unit.ExpressionUnit;
+package edu.myrza.jmathexp.common;
 
 public class Token{
 
@@ -42,7 +40,7 @@ public class Token{
     public Token(Type type,String token){
 
         if(type == null || token == null) throw new IllegalArgumentException("Token args cannot be null...");
-        if(token.isEmpty())               throw new IllegalArgumentException("There are no such token as empty string...");
+        if(token.isEmpty())               throw new IllegalArgumentException("There are no such tokenizer as empty string...");
 
         this.token = token;
         this.type = type;
@@ -52,7 +50,7 @@ public class Token{
     public String toString() {
         return "Token{" +
                 "type=" + type +
-                ", token='" + token + '\'' +
+                ", tokenizer='" + token + '\'' +
                 '}';
     }
 

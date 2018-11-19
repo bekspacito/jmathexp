@@ -27,7 +27,7 @@ public class ExpressionUnitFactoryImpl implements ExpressionUnitFactory{
 
         public Builder addFunction(String token,int argc,Action impl){
 
-            if(token == null || token.equals("")) throw new IllegalArgumentException("token cannot be null or empty string....");
+            if(token == null || token.equals("")) throw new IllegalArgumentException("tokenizer cannot be null or empty string....");
             if(argc <= 0)                         throw new IllegalArgumentException("argument amount cannot be less or equal zero....");
             if(impl == null)                      throw new IllegalArgumentException("math action itself didn't been supplied....");
 
@@ -41,7 +41,7 @@ public class ExpressionUnitFactoryImpl implements ExpressionUnitFactory{
 
         public Builder addUnaryOperator(String token,boolean isLeftAssociative,int precedence,UnaryAction unaryAction){
 
-            if(token == null || token.equals("")) throw new IllegalArgumentException("token cannot be null or empty string....");
+            if(token == null || token.equals("")) throw new IllegalArgumentException("tokenizer cannot be null or empty string....");
             if(precedence <= 0)                         throw new IllegalArgumentException("precedence cannot be less or equal zero....");
             if(unaryAction == null)                      throw new IllegalArgumentException("math unary action itself didn't been supplied....");
 
@@ -56,7 +56,7 @@ public class ExpressionUnitFactoryImpl implements ExpressionUnitFactory{
 
         public Builder addBinaryOperator(String token,boolean isLeftAssociative,int precedence,BinaryAction binaryAction){
 
-            if(token == null || token.equals("")) throw new IllegalArgumentException("token cannot be null or empty string....");
+            if(token == null || token.equals("")) throw new IllegalArgumentException("tokenizer cannot be null or empty string....");
             if(precedence <= 0)                         throw new IllegalArgumentException("precedence cannot be less or equal zero....");
             if(binaryAction == null)                      throw new IllegalArgumentException("math binary action itself didn't been supplied....");
 

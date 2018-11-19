@@ -1,14 +1,11 @@
 package edu.myrza.jmathexp.tokenizer;
 
+import edu.myrza.jmathexp.common.Informator;
 import edu.myrza.jmathexp.common.Token;
-import edu.myrza.jmathexp.expression_unit.ExpUnitType;
-import edu.myrza.jmathexp.expression_unit.ExpressionUnitFactory;
 
 import java.util.*;
 
 import static edu.myrza.jmathexp.common.Token.*;
-import static java.util.Arrays.*;
-import static java.util.stream.Collectors.toSet;
 
 //todo Handle errors
 //todo change Tokenizer constructor so that it receives an Informator
@@ -18,23 +15,17 @@ import static java.util.stream.Collectors.toSet;
 
 public class Tokenizer{
 
-    private final Set<String> functions;
-    private final Set<String> binOpNames;
-    private final Set<String> rsOpNames;
-    private final Set<String> lsOpNames;
+    private final Set<String> fLexemes;
+    private final Set<String> boLexemes;
+    private final Set<String> rsoLexemes;
+    private final Set<String> lsoLexemes;
 
-    public Tokenizer(ExpressionUnitFactory factory){
+    public Tokenizer(Informator informator){
 
-        functions = factory.getIds(ExpUnitType.FUNCTION);
-        binOpNames = factory.getIds(ExpUnitType.BINARY_OPERATOR);
-
-        rsOpNames = factory.getIds(ExpUnitType.UNARY_OPERATOR).stream()
-                .filter(eu -> factory.create(ExpUnitType.UNARY_OPERATOR,eu).isLeftAssociative())
-                .collect(toSet());
-
-        lsOpNames = factory.getIds(ExpUnitType.UNARY_OPERATOR).stream()
-                .filter(eu -> !factory.create(ExpUnitType.UNARY_OPERATOR,eu).isLeftAssociative())
-                .collect(toSet());
+        fLexemes = informator.lexemesOf(Type.FUNCTION);
+        boLexemes = informator.lexemesOf(Type.BINARY_OPERATOR);
+        rsoLexemes = informator.lexemesOf(Type.RS_UNARY_OPERATOR);
+        lsoLexemes = informator.lexemesOf(Type.LS_UNARY_OPERATOR);
 
     }
 
@@ -43,8 +34,8 @@ public class Tokenizer{
         if(exp == null || exp.isEmpty())
             throw new IllegalArgumentException("the math expression can neither be null nor be empty string...");
 
-        LexicalAnalizer lex = new LexicalAnalizer(exp,functions,rsOpNames,lsOpNames,binOpNames);
-        NeighborsMatcher nm = new NeighborsMatcher(exp,binOpNames,lex);
+        LexicalAnalizer lex = new LexicalAnalizer(exp, fLexemes, rsoLexemes, lsoLexemes, boLexemes);
+        NeighborsMatcher nm = new NeighborsMatcher(exp, boLexemes,lex);
 
         List<Token> output = new ArrayList<>();
         while (nm.hasNext())

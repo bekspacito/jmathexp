@@ -72,8 +72,6 @@ class NeighborsMatcher{
 
     }
 
-    public void close(){ }
-
     NeighbourSeekingResult findNeighbour(List<Token> possibleNeighbors, List<Token.Type> neighborsAllowedTypes){
 
         Optional<Token> neighbor = possibleNeighbors.stream()

@@ -3,21 +3,24 @@ package edu.myrza.jmathexp.tokenizer;
 import edu.myrza.jmathexp.common.Token;
 
 import java.util.*;
-import static java.util.stream.Collectors.*;
 
 import static java.util.Arrays.asList;
+import static java.util.stream.Collectors.*;
 
 class NeighborsMatcher{
 
     private LexicalAnalizer lex;
+    private String exp;
     private List<Token> output;
     private Set<String> binOpNames;
-    private Token current = new Token(Token.Type.START,"[");
+    private Token current;
     private static Map<Token.Type,List<Token.Type>> neighboursAllowedTypes = new HashMap<>();
 
     public NeighborsMatcher(String exp,Set<String> binOpNames,LexicalAnalizer lex){
         this.lex = lex;
         this.binOpNames = binOpNames;
+        this.exp = exp;
+        this.current = new Token(Token.Type.START,"[");
         output = new ArrayList<>();
     }
 
@@ -55,7 +58,7 @@ class NeighborsMatcher{
 
         if(!result.isNeighborFound && current.type == Token.Type.RS_UNARY_OPERATOR){
             //change RSO to BO if possible and try to find neighbour again
-            String currentToken = current.token;
+            String currentToken = current.lexeme;
             if(binOpNames.stream().anyMatch(bo -> bo.equals(currentToken))){
                 current = new Token(Token.Type.BINARY_OPERATOR,currentToken);
                 result = findNeighbour(possibleNeighbours, neighboursAllowedTypes.get(current.type));
@@ -63,7 +66,7 @@ class NeighborsMatcher{
         }
 
         if(!result.isNeighborFound) {
-            throw new NoSuitableNeighborException(output.stream().map(t -> "[" + t.token + "]").collect(joining()), current.token, possibleNeighbours.get(0).token);
+            handleNoSuitableNeighbors(current,possibleNeighbours.get(0));
         }
 
         output.add(current);
@@ -75,12 +78,33 @@ class NeighborsMatcher{
     NeighbourSeekingResult findNeighbour(List<Token> possibleNeighbors, List<Token.Type> neighborsAllowedTypes){
 
         Optional<Token> neighbor = possibleNeighbors.stream()
-                .filter(t -> neighborsAllowedTypes.contains(t.type))
-                .findFirst();
+                                                    .filter(t -> neighborsAllowedTypes.contains(t.type))
+                                                    .findFirst();
         if(neighbor.isPresent())
             return new NeighbourSeekingResult(true,neighbor.get());
 
         return new NeighbourSeekingResult(false,null);
+    }
+
+    private void handleNoSuitableNeighbors(Token current , Token badNeighbor){
+
+        if(current.type == Token.Type.START)
+            throw new RuntimeException("Token [" + badNeighbor.lexeme + "] cannot be at the start....");
+
+        if(badNeighbor.type == Token.Type.END)
+            throw new RuntimeException("The expression [" + exp + "] is unfinished...");
+
+        //todo handle TOKEN.Type.START being in output
+        output.remove(0);
+        String tokenStr = output.stream().map(t -> "[" + t.lexeme + "]").collect(joining());
+        int errorOccurencePosition = tokenStr.length() - output.size()*2;
+
+        String message = "At position " + errorOccurencePosition + "\n" +
+                         "These two tokens : [" + current.lexeme + "][" + badNeighbor.lexeme + "] cannot be neighbors....\n" +
+                         "prev. tokens : " + tokenStr;
+
+        throw new RuntimeException(message);
+
     }
 
     private class NeighbourSeekingResult {

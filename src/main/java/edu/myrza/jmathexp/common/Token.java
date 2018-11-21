@@ -35,14 +35,14 @@ public class Token{
     }
 
     public final Type type;
-    public final String token;
+    public final String lexeme;
 
-    public Token(Type type,String token){
+    public Token(Type type,String lexeme){
 
-        if(type == null || token == null) throw new IllegalArgumentException("Token args cannot be null...");
-        if(token.isEmpty())               throw new IllegalArgumentException("There are no such tokenizer as empty string...");
+        if(type == null || lexeme == null) throw new IllegalArgumentException("Token args cannot be null...");
+        if(lexeme.isEmpty())               throw new IllegalArgumentException("There are no such tokenizer as empty string...");
 
-        this.token = token;
+        this.lexeme = lexeme;
         this.type = type;
     }
 
@@ -50,7 +50,7 @@ public class Token{
     public String toString() {
         return "Token{" +
                 "type=" + type +
-                ", tokenizer='" + token + '\'' +
+                ", tokenizer='" + lexeme + '\'' +
                 '}';
     }
 
@@ -59,16 +59,16 @@ public class Token{
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        Token token1 = (Token) o;
+        Token token = (Token) o;
 
-        if (type != token1.type) return false;
-        return token != null ? token.equals(token1.token) : token1.token == null;
+        if (type != token.type) return false;
+        return lexeme.equals(token.lexeme);
     }
 
     @Override
     public int hashCode() {
-        int result = type != null ? type.hashCode() : 0;
-        result = 31 * result + (token != null ? token.hashCode() : 0);
+        int result = type.hashCode();
+        result = 31 * result + lexeme.hashCode();
         return result;
     }
 }

@@ -21,7 +21,7 @@ public class InformatorImpl implements Informator{
         if(function.type != Token.Type.FUNCTION)
             throw new IllegalArgumentException("required : Token of Type FUNCTION\nfound : Token of Type" + function.type);
 
-        ExpressionUnit res = factory.create(ExpUnitType.FUNCTION,function.token);
+        ExpressionUnit res = factory.create(ExpUnitType.FUNCTION,function.lexeme);
 
         return res.getArgc();
     }
@@ -35,9 +35,9 @@ public class InformatorImpl implements Informator{
             throw new IllegalArgumentException("required : Token of Type *_OPERATOR\nfound : Token of Type" + operator.type);
 
         if(operator.type == Token.Type.BINARY_OPERATOR)
-            return factory.create(ExpUnitType.BINARY_OPERATOR,operator.token).isLeftAssociative();
+            return factory.create(ExpUnitType.BINARY_OPERATOR,operator.lexeme).isLeftAssociative();
         else
-            return factory.create(ExpUnitType.UNARY_OPERATOR,operator.token).isLeftAssociative();
+            return factory.create(ExpUnitType.UNARY_OPERATOR,operator.lexeme).isLeftAssociative();
 
     }
 
@@ -50,9 +50,9 @@ public class InformatorImpl implements Informator{
             throw new IllegalArgumentException("required : Token of Type *_OPERATOR\nfound : Token of Type" + operator.type);
 
         if(operator.type == Token.Type.BINARY_OPERATOR)
-            return factory.create(ExpUnitType.BINARY_OPERATOR,operator.token).getPrecedence();
+            return factory.create(ExpUnitType.BINARY_OPERATOR,operator.lexeme).getPrecedence();
         else
-            return factory.create(ExpUnitType.UNARY_OPERATOR,operator.token).getPrecedence();
+            return factory.create(ExpUnitType.UNARY_OPERATOR,operator.lexeme).getPrecedence();
     }
 
     @Override

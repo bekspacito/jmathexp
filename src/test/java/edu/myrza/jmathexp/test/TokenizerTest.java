@@ -1,18 +1,17 @@
 package edu.myrza.jmathexp.test;
 
-import edu.myrza.jmathexp.expression_unit.ExpUnitType;
+import edu.myrza.jmathexp.common.Informator;
 import edu.myrza.jmathexp.expression_unit.ExpressionUnitFactory;
 import edu.myrza.jmathexp.expression_unit.ExpressionUnitFactoryImpl;
-import edu.myrza.jmathexp.token.Token;
-import edu.myrza.jmathexp.token.Tokenizer;
+import edu.myrza.jmathexp.common.Token;
+import edu.myrza.jmathexp.expression_unit.InformatorImpl;
+import edu.myrza.jmathexp.tokenizer.Tokenizer;
 
 import org.junit.Test;
 
 import java.util.List;
-import java.util.Set;
 import java.util.stream.IntStream;
 
-import static java.util.stream.Collectors.toSet;
 import static org.junit.Assert.*;
 import static edu.myrza.jmathexp.expression_unit.BuiltInOperators.*;
 
@@ -31,17 +30,9 @@ public class TokenizerTest {
                                                                      })
                                                                      .build();
 
-        Set<String> functionNames = factory.getIds(ExpUnitType.FUNCTION);
-        Set<String> binOpNames    = factory.getIds(ExpUnitType.BINARY_OPERATOR);
-        Set<String> rightSideUnOpNames = factory.getIds(ExpUnitType.UNARY_OPERATOR).stream()
-                                                                                   .filter(eu -> factory.create(ExpUnitType.UNARY_OPERATOR,eu).isLeftAssociative())
-                                                                                   .collect(toSet());
+        Informator informator = new InformatorImpl(factory);
 
-        Set<String> leftSideUnOpNames = factory.getIds(ExpUnitType.UNARY_OPERATOR).stream()
-                                                                                  .filter(eu -> !factory.create(ExpUnitType.UNARY_OPERATOR,eu).isLeftAssociative())
-                                                                                  .collect(toSet());
-
-        tokenizer = new Tokenizer(factory);
+        tokenizer = new Tokenizer(informator);
     }
 
     @Test
@@ -250,5 +241,30 @@ public class TokenizerTest {
 
     }
 
+    @Test(expected = RuntimeException.class)
+    public void test12(){
+
+        String exp = "19!!!!!!19";
+
+        List<Token> result = tokenizer.tokenize(exp);
+
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void test13(){
+
+        String exp = "19!!!!!$19";
+
+        List<Token> result = tokenizer.tokenize(exp);
+
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void test14(){
+
+        String exp = "19+log(4,3)";
+
+        List<Token> res = tokenizer.tokenize(exp);
+    }
 
 }

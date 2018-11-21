@@ -92,27 +92,32 @@ public class LexicalAnalizer{
 
             //is reversed symbols
             Optional<Token> resToken = reserveSymbols.stream()
-                    .filter(t -> scanner.findWithinHorizon("\\Q" + t.token + "\\E",t.token.length()) != null)
+                    .filter(t -> scanner.findWithinHorizon("\\Q" + t.lexeme + "\\E",t.lexeme.length()) != null)
                     .findFirst();
 
             if(resToken.isPresent()){
-                pointer += resToken.get().token.length();
+                pointer += resToken.get().lexeme.length();
                 result.add(resToken.get());
                 return result;
             }
 
-            //todo rename NoSuchTokenException to NoTokenFoundException
-            throw new NoSuchTokenException(exp,pointer);
+            throw new RuntimeException("An unknown tokenizer appeared starting at position : " + ++pointer);
+
         }
 
         private List<Token> getMatchedTokens(String nextTokenStr){
 
             List<Token> result = new ArrayList<>();
 
+            //todo if we swap places of if 1 and if 2 everything will go to shit!!!
+            //handle this
+            //if 1
             if(rsOperators.stream().anyMatch(str -> str.equals(nextTokenStr)))
                 result.add(new Token(Token.Type.RS_UNARY_OPERATOR,nextTokenStr));
+
             if(lsOperators.stream().anyMatch(str -> str.equals(nextTokenStr)))
                 result.add(new Token(Token.Type.LS_UNARY_OPERATOR,nextTokenStr));
+            //if 2
             if(binaryOperators.stream().anyMatch(str -> str.equals(nextTokenStr)))
                 result.add(new Token(Token.Type.BINARY_OPERATOR,nextTokenStr));
 

@@ -7,11 +7,6 @@ import java.util.*;
 
 import static edu.myrza.jmathexp.common.Token.*;
 
-//todo Handle errors
-//todo change Tokenizer constructor so that it receives an Informator
-//todo function names have to be sorted decreasingly by length
-//todo RSO names have to be sorted decreasingly by priority of RSO operations
-//todo LSO operations have to be sorted increasingly by priority of LSO operations
 
 public class Tokenizer{
 
@@ -38,7 +33,7 @@ public class Tokenizer{
 
         LexicalAnalizer lex = new LexicalAnalizer(exp, fLexemes, rsoLexemes, lsoLexemes, boLexemes);
         NeighborsMatcher nm = new NeighborsMatcher(exp, boLexemes,lex);
-        SyntaxAnalizer sa = new SyntaxAnalizer(nm,informator);
+        SyntaxAnalizer sa = new SyntaxAnalizer(exp,nm,informator);
 
         List<Token> output = new ArrayList<>();
         while (sa.hasNext())

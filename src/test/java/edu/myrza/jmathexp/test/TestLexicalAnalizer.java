@@ -3,9 +3,9 @@ package edu.myrza.jmathexp.test;
 import edu.myrza.jmathexp.expression_unit.ExpUnitType;
 import edu.myrza.jmathexp.expression_unit.ExpressionUnitFactory;
 import edu.myrza.jmathexp.expression_unit.ExpressionUnitFactoryImpl;
-import edu.myrza.jmathexp.token.NoSuchTokenException;
-import edu.myrza.jmathexp.token.Token;
-import edu.myrza.jmathexp.token.Tokenizer;
+import edu.myrza.jmathexp.tokenizer.NoSuchTokenException;
+import edu.myrza.jmathexp.common.Token;
+import edu.myrza.jmathexp.tokenizer.LexicalAnalizer;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -52,7 +52,7 @@ public class TestLexicalAnalizer {
     public void test1(){
 
         String exp = "-3+4!";
-        List<List<Token>> result = getAllTheTokens(new Tokenizer.LexicalAnalizer(exp,functions,rsOpNames,lsOpNames,binOpNames));
+        List<List<Token>> result = getAllTheTokens(new LexicalAnalizer(exp,functions,rsOpNames,lsOpNames,binOpNames));
 
         assertTrue(result.get(0).size() == 2);
         assertTrue(contains(result.get(0),new Token(Token.Type.LS_UNARY_OPERATOR,"-"),new Token(Token.Type.BINARY_OPERATOR,"-")));
@@ -75,7 +75,7 @@ public class TestLexicalAnalizer {
     public void test2(){
 
         String exp = "+--+2*4+-log(3)";
-        List<List<Token>> result = getAllTheTokens(new Tokenizer.LexicalAnalizer(exp,functions,rsOpNames,lsOpNames,binOpNames));
+        List<List<Token>> result = getAllTheTokens(new LexicalAnalizer(exp,functions,rsOpNames,lsOpNames,binOpNames));
 
         assertTrue(result.get(0).size() == 2);
         assertTrue(contains(result.get(0),new Token(Token.Type.LS_UNARY_OPERATOR,"+"),new Token(Token.Type.BINARY_OPERATOR,"+")));
@@ -122,7 +122,7 @@ public class TestLexicalAnalizer {
     public void test3(){
 
         String exp = "2+3$$5"; // error $$ is an undefined operator
-        List<List<Token>> result = getAllTheTokens(new Tokenizer.LexicalAnalizer(exp,functions,rsOpNames,lsOpNames,binOpNames));
+        List<List<Token>> result = getAllTheTokens(new LexicalAnalizer(exp,functions,rsOpNames,lsOpNames,binOpNames));
 
     }
 
@@ -130,7 +130,7 @@ public class TestLexicalAnalizer {
     public void test4(){
 
         String exp = "3+++++4";
-        List<List<Token>> result = getAllTheTokens(new Tokenizer.LexicalAnalizer(exp,functions,rsOpNames,lsOpNames,binOpNames));
+        List<List<Token>> result = getAllTheTokens(new LexicalAnalizer(exp,functions,rsOpNames,lsOpNames,binOpNames));
 
         assertTrue(result.get(0).size() == 1);
         assertTrue(contains(result.get(0),new Token(Token.Type.OPERAND,"3")));
@@ -150,7 +150,7 @@ public class TestLexicalAnalizer {
 
     }
 
-    private List<List<Token>> getAllTheTokens(Tokenizer.LexicalAnalizer la){
+    private List<List<Token>> getAllTheTokens(LexicalAnalizer la){
 
         List<List<Token>> result = new ArrayList<>();
 

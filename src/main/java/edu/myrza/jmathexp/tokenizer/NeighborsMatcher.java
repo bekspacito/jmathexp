@@ -6,21 +6,22 @@ import java.util.*;
 
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.*;
+import static java.util.Comparator.*;
 
 class NeighborsMatcher{
 
     private LexicalAnalizer lex;
     private String exp;
     private List<Token> output;
-    private Set<String> binOpNames;
-    private Token current;
-    private static Map<Token.Type,List<Token.Type>> neighboursAllowedTypes = new HashMap<>();
+    private List<Token> current;
+    private List<Token> next;
+    private Token lastProcessed;
+    private static Map<Token.Type,List<Token.Type>> rightNeighboursAllowedTypes = new HashMap<>();
 
     public NeighborsMatcher(String exp,Set<String> binOpNames,LexicalAnalizer lex){
         this.lex = lex;
-        this.binOpNames = binOpNames;
         this.exp = exp;
-        this.current = new Token(Token.Type.START,"[");
+        this.lastProcessed = new Token(Token.Type.START,"[");
         output = new ArrayList<>();
     }
 
@@ -29,17 +30,17 @@ class NeighborsMatcher{
         List<Token.Type> allowTypesSetOne = asList(Token.Type.OPERAND, Token.Type.LS_UNARY_OPERATOR, Token.Type.FUNCTION, Token.Type.OPEN_PARENTHESES);
         List<Token.Type> allowTypesSetTwo = asList(Token.Type.RS_UNARY_OPERATOR, Token.Type.BINARY_OPERATOR, Token.Type.CLOSE_PARENTHESES, Token.Type.FUNCTION_ARG_SEPARATOR, Token.Type.END);
 
-        neighboursAllowedTypes.put(Token.Type.START,                  allowTypesSetOne);
-        neighboursAllowedTypes.put(Token.Type.LS_UNARY_OPERATOR,      allowTypesSetOne);
-        neighboursAllowedTypes.put(Token.Type.BINARY_OPERATOR,        allowTypesSetOne);
-        neighboursAllowedTypes.put(Token.Type.OPEN_PARENTHESES,       allowTypesSetOne);
-        neighboursAllowedTypes.put(Token.Type.FUNCTION_ARG_SEPARATOR, allowTypesSetOne);
+        rightNeighboursAllowedTypes.put(Token.Type.START,                  allowTypesSetOne);
+        rightNeighboursAllowedTypes.put(Token.Type.LS_UNARY_OPERATOR,      allowTypesSetOne);
+        rightNeighboursAllowedTypes.put(Token.Type.BINARY_OPERATOR,        allowTypesSetOne);
+        rightNeighboursAllowedTypes.put(Token.Type.OPEN_PARENTHESES,       allowTypesSetOne);
+        rightNeighboursAllowedTypes.put(Token.Type.FUNCTION_ARG_SEPARATOR, allowTypesSetOne);
 
-        neighboursAllowedTypes.put(Token.Type.OPERAND,                allowTypesSetTwo);
-        neighboursAllowedTypes.put(Token.Type.RS_UNARY_OPERATOR,      allowTypesSetTwo);
-        neighboursAllowedTypes.put(Token.Type.CLOSE_PARENTHESES,      allowTypesSetTwo);
+        rightNeighboursAllowedTypes.put(Token.Type.OPERAND,                allowTypesSetTwo);
+        rightNeighboursAllowedTypes.put(Token.Type.RS_UNARY_OPERATOR,      allowTypesSetTwo);
+        rightNeighboursAllowedTypes.put(Token.Type.CLOSE_PARENTHESES,      allowTypesSetTwo);
 
-        neighboursAllowedTypes.put(Token.Type.FUNCTION,               asList(Token.Type.OPEN_PARENTHESES));
+        rightNeighboursAllowedTypes.put(Token.Type.FUNCTION,               asList(Token.Type.OPEN_PARENTHESES));
 
     }
 
@@ -47,44 +48,50 @@ class NeighborsMatcher{
 
     public Token next(){
 
-        List<Token> possibleNeighbours = null;
-        NeighbourSeekingResult result = null;
+        if(lastProcessed.type == Token.Type.START)
+            current = lex.next();
+        next = lex.next();
 
-        if (!lex.hasNext())
-            throw new NoSuchElementException("no tokens left....");
+        Token result = findSuitableCurrent(lastProcessed,current,next);
 
-        possibleNeighbours = lex.next();
-        result = findNeighbour(possibleNeighbours, neighboursAllowedTypes.get(current.type));
-
-        if(!result.isNeighborFound && current.type == Token.Type.RS_UNARY_OPERATOR){
-            //change RSO to BO if possible and try to find neighbour again
-            String currentToken = current.lexeme;
-            if(binOpNames.stream().anyMatch(bo -> bo.equals(currentToken))){
-                current = new Token(Token.Type.BINARY_OPERATOR,currentToken);
-                result = findNeighbour(possibleNeighbours, neighboursAllowedTypes.get(current.type));
-            }
-        }
-
-        if(!result.isNeighborFound) {
-            handleNoSuitableNeighbors(current,possibleNeighbours.get(0));
-        }
-
-        output.add(current);
-        current = result.suitNeighbor;
-        return current;
-
+        output.add(result);
+        lastProcessed = result;
+        current = next;
+        return result;
     }
 
-    NeighbourSeekingResult findNeighbour(List<Token> possibleNeighbors, List<Token.Type> neighborsAllowedTypes){
+    Token findSuitableCurrent(Token lastProcessed,
+                              List<Token> currents,
+                              List<Token> currentRightNeighborCandidates)
+    {
 
-        Optional<Token> neighbor = possibleNeighbors.stream()
-                                                    .filter(t -> neighborsAllowedTypes.contains(t.type))
-                                                    .findFirst();
-        if(neighbor.isPresent())
-            return new NeighbourSeekingResult(true,neighbor.get());
+        List<Token> currentCandidates = findSuitableNeighbors(lastProcessed,currents);
 
-        return new NeighbourSeekingResult(false,null);
+        if(currentCandidates.size() <= 0)
+            handleNoSuitableNeighbors(lastProcessed,currentRightNeighborCandidates.get(0));
+        else
+            currentCandidates.sort(comparingInt(t -> t.type.id()));
+
+        for(Token t : currentCandidates)
+            if(findSuitableNeighbors(t,currentRightNeighborCandidates).size() > 0)
+                return t;
+
+        handleNoSuitableNeighbors(currentCandidates.get(0),currentRightNeighborCandidates.get(0));
+        return null;
     }
+
+    //todo use this
+    List<Token> findSuitableNeighbors(Token token,List<Token> candidates){
+
+        //gets allowed types for t's right neighbor
+        List<Token.Type> allowedTypes = rightNeighboursAllowedTypes.get(token.type);
+
+        return candidates.stream()
+                         .filter(t -> allowedTypes.contains(t.type))
+                         .collect(toList());
+    }
+
+
 
     private void handleNoSuitableNeighbors(Token current , Token badNeighbor){
 
@@ -95,7 +102,6 @@ class NeighborsMatcher{
             throw new RuntimeException("The expression [" + exp + "] is unfinished...");
 
         //todo handle TOKEN.Type.START being in output
-        output.remove(0);
         String tokenStr = output.stream().map(t -> "[" + t.lexeme + "]").collect(joining());
         int errorOccurencePosition = tokenStr.length() - output.size()*2;
 
@@ -107,15 +113,5 @@ class NeighborsMatcher{
 
     }
 
-    private class NeighbourSeekingResult {
-
-        public final boolean isNeighborFound;
-        public final Token suitNeighbor;
-
-        public NeighbourSeekingResult(boolean isNeighborFound, Token suitNeighbor) {
-            this.isNeighborFound = isNeighborFound;
-            this.suitNeighbor = suitNeighbor;
-        }
-    }
 
 }

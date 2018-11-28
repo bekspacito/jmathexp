@@ -101,7 +101,7 @@ public class LexicalAnalizer{
                 return result;
             }
 
-            throw new RuntimeException("An unknown tokenizer appeared starting at position : " + ++pointer);
+            throw new RuntimeException("An unknown tokenizer appeared ,starting at position : " + ++pointer);
 
         }
 
@@ -109,17 +109,14 @@ public class LexicalAnalizer{
 
             List<Token> result = new ArrayList<>();
 
-            //todo if we swap places of if 1 and if 2 everything will go to shit!!!
-            //handle this
-            //if 1
-            if(rsOperators.stream().anyMatch(str -> str.equals(nextTokenStr)))
-                result.add(new Token(Token.Type.RS_UNARY_OPERATOR,nextTokenStr));
-
             if(lsOperators.stream().anyMatch(str -> str.equals(nextTokenStr)))
                 result.add(new Token(Token.Type.LS_UNARY_OPERATOR,nextTokenStr));
-            //if 2
+
             if(binaryOperators.stream().anyMatch(str -> str.equals(nextTokenStr)))
                 result.add(new Token(Token.Type.BINARY_OPERATOR,nextTokenStr));
+
+            if(rsOperators.stream().anyMatch(str -> str.equals(nextTokenStr)))
+                result.add(new Token(Token.Type.RS_UNARY_OPERATOR,nextTokenStr));
 
             return result;
         }

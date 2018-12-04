@@ -1,6 +1,9 @@
-package edu.myrza.jmathexp.expression_unit;
+package edu.myrza.jmathexp.expression_unit.operand;
 
-public class Operand implements ExpressionUnit{
+import edu.myrza.jmathexp.expression_unit.ExpUnitType;
+import edu.myrza.jmathexp.expression_unit.ExpressionUnit;
+
+public class Operand implements ExpressionUnit {
 
     private double value;
 
@@ -27,7 +30,7 @@ public class Operand implements ExpressionUnit{
     }
 
     public int getPrecedence() {
-        throw new UnsupportedOperationException("operands don't have precedence");
+        throw new UnsupportedOperationException("operands don't have precedence....");
     }
 
     public ExpUnitType getType() {

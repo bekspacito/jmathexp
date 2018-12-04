@@ -1,5 +1,12 @@
 package edu.myrza.jmathexp.expression_unit;
 
+import edu.myrza.jmathexp.expression_unit.binary_operator.BinaryOperator;
+import edu.myrza.jmathexp.expression_unit.binary_operator.BinaryOperatorsBody;
+import edu.myrza.jmathexp.expression_unit.function.Function;
+import edu.myrza.jmathexp.expression_unit.function.FunctionsBody;
+import edu.myrza.jmathexp.expression_unit.unary_operator.UnaryOperator;
+import edu.myrza.jmathexp.expression_unit.unary_operator.UnaryOperatorsBody;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -25,7 +32,7 @@ public class ExpressionUnitFactoryImpl implements ExpressionUnitFactory{
         private Map<String,BinaryOperator> customBinaryOperators;
         private Map<String,UnaryOperator>  customUnaryOperators;
 
-        public Builder addFunction(String token,int argc,Action impl){
+        public Builder addFunction(String token,int argc,FunctionsBody impl){
 
             if(token == null || token.equals("")) throw new IllegalArgumentException("tokenizer cannot be null or empty string....");
             if(argc <= 0)                         throw new IllegalArgumentException("argument amount cannot be less or equal zero....");
@@ -39,31 +46,31 @@ public class ExpressionUnitFactoryImpl implements ExpressionUnitFactory{
             return this;
         }
 
-        public Builder addUnaryOperator(String token,boolean isLeftAssociative,int precedence,UnaryAction unaryAction){
+        public Builder addUnaryOperator(String token,boolean isLeftAssociative,int precedence,UnaryOperatorsBody unaryOperatorsBody){
 
             if(token == null || token.equals("")) throw new IllegalArgumentException("tokenizer cannot be null or empty string....");
             if(precedence <= 0)                         throw new IllegalArgumentException("precedence cannot be less or equal zero....");
-            if(unaryAction == null)                      throw new IllegalArgumentException("math unary action itself didn't been supplied....");
+            if(unaryOperatorsBody == null)                      throw new IllegalArgumentException("math unary action itself didn't been supplied....");
 
             if(customUnaryOperators == null)
                 customUnaryOperators = new HashMap<>();
 
-            customUnaryOperators.put(token,new UnaryOperator(token,isLeftAssociative,precedence,unaryAction));
+            customUnaryOperators.put(token,new UnaryOperator(token,isLeftAssociative,precedence, unaryOperatorsBody));
 
             return this;
 
         }
 
-        public Builder addBinaryOperator(String token,boolean isLeftAssociative,int precedence,BinaryAction binaryAction){
+        public Builder addBinaryOperator(String token,boolean isLeftAssociative,int precedence,BinaryOperatorsBody binaryOperatorsBody){
 
             if(token == null || token.equals("")) throw new IllegalArgumentException("tokenizer cannot be null or empty string....");
             if(precedence <= 0)                         throw new IllegalArgumentException("precedence cannot be less or equal zero....");
-            if(binaryAction == null)                      throw new IllegalArgumentException("math binary action itself didn't been supplied....");
+            if(binaryOperatorsBody == null)                      throw new IllegalArgumentException("math binary action itself didn't been supplied....");
 
             if(customBinaryOperators == null)
                 customBinaryOperators = new HashMap<>();
 
-            customBinaryOperators.put(token,new BinaryOperator(token,isLeftAssociative,precedence,binaryAction));
+            customBinaryOperators.put(token,new BinaryOperator(token,isLeftAssociative,precedence, binaryOperatorsBody));
 
             return this;
         }
@@ -89,16 +96,11 @@ public class ExpressionUnitFactoryImpl implements ExpressionUnitFactory{
         }
     }
 
-    @Override
-    public ExpressionUnit convert(double number) {
-       return new Operand(number);
-    }
-
     /**
      * Both global and local functions/operators are merged here
      * */
     @Override
-    public Set<String> getIds(ExpUnitType type) {
+    public Set<String> getLexemes(ExpUnitType type) {
 
         switch (type){
             case FUNCTION         : return getIds(customFunctions      , BuiltInFunctions::getFunctionNames);

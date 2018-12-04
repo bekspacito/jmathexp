@@ -1,9 +1,12 @@
-package edu.myrza.jmathexp.expression_unit;
+package edu.myrza.jmathexp.expression_unit.function;
 
-public class Function implements ExpressionUnit{
+import edu.myrza.jmathexp.expression_unit.ExpUnitType;
+import edu.myrza.jmathexp.expression_unit.ExpressionUnit;
 
-    private Action impl;
-    private String token;
+public class Function implements ExpressionUnit {
+
+    private FunctionsBody impl;
+    private String lexeme;
     private int argc;
 
     private static ExpUnitType type;
@@ -12,10 +15,10 @@ public class Function implements ExpressionUnit{
         type = ExpUnitType.FUNCTION;
     }
 
-    public Function(String token, int argc, Action impl){
+    public Function(String lexeme, int argc, FunctionsBody impl){
 
         this.impl = impl;
-        this.token = token;
+        this.lexeme = lexeme;
         this.argc = argc;
 
     }
@@ -48,7 +51,7 @@ public class Function implements ExpressionUnit{
     @Override
     public String toString() {
         return "Function{" +
-                "tokenizer='" + token + '\'' +
+                "tokenizer='" + lexeme + '\'' +
                 '}';
     }
 }

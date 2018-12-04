@@ -1,10 +1,13 @@
-package edu.myrza.jmathexp.expression_unit;
+package edu.myrza.jmathexp.expression_unit.unary_operator;
 
-public class UnaryOperator implements ExpressionUnit{
+import edu.myrza.jmathexp.expression_unit.ExpUnitType;
+import edu.myrza.jmathexp.expression_unit.ExpressionUnit;
 
-    private UnaryAction impl;
+public class UnaryOperator implements ExpressionUnit {
+
+    private UnaryOperatorsBody impl;
     private int precedence;
-    private String name;
+    private String lexeme;
     private boolean isLeftAssociative;
 
     private static ExpUnitType type;
@@ -15,11 +18,11 @@ public class UnaryOperator implements ExpressionUnit{
         argc = 1;
     }
 
-    public UnaryOperator(String name,boolean isLeftAssociative, int precedence, UnaryAction impl){
+    public UnaryOperator(String lexeme, boolean isLeftAssociative, int precedence, UnaryOperatorsBody impl){
 
         this.isLeftAssociative = isLeftAssociative;
         this.impl = impl;
-        this.name = name;
+        this.lexeme = lexeme;
         this.precedence = precedence;
 
     }
@@ -52,7 +55,7 @@ public class UnaryOperator implements ExpressionUnit{
     @Override
     public String toString() {
         return "UnaryOperator{" +
-                "name='" + name + '\'' +
+                "lexeme='" + lexeme + '\'' +
                 '}';
     }
 }

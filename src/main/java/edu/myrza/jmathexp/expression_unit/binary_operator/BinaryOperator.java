@@ -1,10 +1,13 @@
-package edu.myrza.jmathexp.expression_unit;
+package edu.myrza.jmathexp.expression_unit.binary_operator;
 
-public class BinaryOperator implements ExpressionUnit{
+import edu.myrza.jmathexp.expression_unit.ExpUnitType;
+import edu.myrza.jmathexp.expression_unit.ExpressionUnit;
 
-    private BinaryAction impl;
+public class BinaryOperator implements ExpressionUnit {
+
+    private BinaryOperatorsBody impl;
     private int precedence;
-    private String name;
+    private String lexeme;
     private boolean isLeftAssociative;
 
     private static ExpUnitType type;
@@ -16,10 +19,10 @@ public class BinaryOperator implements ExpressionUnit{
         argc = 2;
     }
 
-    public BinaryOperator(String name,boolean isLeftAssociative,int precedence, BinaryAction impl){
+    public BinaryOperator(String lexeme, boolean isLeftAssociative, int precedence, BinaryOperatorsBody impl){
 
         this.isLeftAssociative = isLeftAssociative;
-        this.name = name;
+        this.lexeme = lexeme;
         this.precedence = precedence;
         this.impl = impl;
 
@@ -53,7 +56,7 @@ public class BinaryOperator implements ExpressionUnit{
     @Override
     public String toString() {
         return "BinaryOperator{" +
-                "name='" + name + '\'' +
+                "lexeme='" + lexeme + '\'' +
                 '}';
     }
 }

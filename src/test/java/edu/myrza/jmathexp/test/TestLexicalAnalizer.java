@@ -36,14 +36,14 @@ public class TestLexicalAnalizer {
                 .addUnaryOperator("++",true,POWER_PRECEDENCE + 100,arg -> arg + 1)
                 .build();
 
-        functions = factory.getIds(ExpUnitType.FUNCTION);
-        binOpNames    = factory.getIds(ExpUnitType.BINARY_OPERATOR);
+        functions = factory.getLexemes(ExpUnitType.FUNCTION);
+        binOpNames    = factory.getLexemes(ExpUnitType.BINARY_OPERATOR);
 
-        rsOpNames = factory.getIds(ExpUnitType.UNARY_OPERATOR).stream()
+        rsOpNames = factory.getLexemes(ExpUnitType.UNARY_OPERATOR).stream()
                 .filter(eu -> factory.create(ExpUnitType.UNARY_OPERATOR,eu).isLeftAssociative())
                 .collect(toSet());
 
-        lsOpNames = factory.getIds(ExpUnitType.UNARY_OPERATOR).stream()
+        lsOpNames = factory.getLexemes(ExpUnitType.UNARY_OPERATOR).stream()
                 .filter(eu -> !factory.create(ExpUnitType.UNARY_OPERATOR,eu).isLeftAssociative())
                 .collect(toSet());
     }

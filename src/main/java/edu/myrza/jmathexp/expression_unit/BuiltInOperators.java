@@ -1,5 +1,8 @@
 package edu.myrza.jmathexp.expression_unit;
 
+import edu.myrza.jmathexp.expression_unit.binary_operator.BinaryOperator;
+import edu.myrza.jmathexp.expression_unit.unary_operator.UnaryOperator;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;

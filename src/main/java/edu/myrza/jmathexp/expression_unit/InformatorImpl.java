@@ -7,6 +7,11 @@ import java.util.Set;
 
 import static java.util.stream.Collectors.toSet;
 
+/**
+ * Informator is an Adapter which knows about both Tokens(Tokenizer,ShuntingYard) and ExpressionUnits(ExpressionUnitFactory)
+ * and because of Informator neither of the sides with which the Informator works don't know about each other
+ * */
+
 public class InformatorImpl implements Informator{
 
     private ExpressionUnitFactory factory;
@@ -19,7 +24,7 @@ public class InformatorImpl implements Informator{
     public int funcArgc(Token function) {
 
         if(function.type != Token.Type.FUNCTION)
-            throw new IllegalArgumentException("required : Token of Type FUNCTION\nfound : Token of Type" + function.type);
+            throw new IllegalArgumentException("required : Token of Type FUNCTION\nfound : Token of Type " + function.type);
 
         ExpressionUnit res = factory.create(ExpUnitType.FUNCTION,function.lexeme);
 
@@ -59,12 +64,12 @@ public class InformatorImpl implements Informator{
     public Set<String> lexemesOf(Token.Type type) {
 
         switch (type) {
-            case BINARY_OPERATOR   : return factory.getIds(ExpUnitType.BINARY_OPERATOR);
-            case FUNCTION          : return factory.getIds(ExpUnitType.FUNCTION);
-            case RS_UNARY_OPERATOR : return factory.getIds(ExpUnitType.UNARY_OPERATOR).stream()
+            case BINARY_OPERATOR   : return factory.getLexemes(ExpUnitType.BINARY_OPERATOR);
+            case FUNCTION          : return factory.getLexemes(ExpUnitType.FUNCTION);
+            case RS_UNARY_OPERATOR : return factory.getLexemes(ExpUnitType.UNARY_OPERATOR).stream()
                                                     .filter(eu -> factory.create(ExpUnitType.UNARY_OPERATOR, eu).isLeftAssociative())
                                                     .collect(toSet());
-            case LS_UNARY_OPERATOR : return factory.getIds(ExpUnitType.UNARY_OPERATOR).stream()
+            case LS_UNARY_OPERATOR : return factory.getLexemes(ExpUnitType.UNARY_OPERATOR).stream()
                                                     .filter(eu -> !factory.create(ExpUnitType.UNARY_OPERATOR, eu).isLeftAssociative())
                                                     .collect(toSet());
             default                : {

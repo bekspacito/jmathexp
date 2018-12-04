@@ -1,5 +1,7 @@
 package edu.myrza.jmathexp.expression_unit;
 
+import edu.myrza.jmathexp.expression_unit.function.Function;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;

@@ -12,6 +12,7 @@ import edu.myrza.jmathexp.expression_unit.InformatorImpl;
 import edu.myrza.jmathexp.shuntingyard.ShuntingYard;
 import edu.myrza.jmathexp.tokenizer.Tokenizer;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class TestShuntingYard{
@@ -37,6 +38,7 @@ public class TestShuntingYard{
                                                                          return result;
 
                                                                      })
+                                                                     .addFunction("max",3,args -> Arrays.stream(args).max().getAsDouble())
                                                                      .build();
 
         informator =  new InformatorImpl(factory);
@@ -158,6 +160,78 @@ public class TestShuntingYard{
         assertEquals(new Token(Token.Type.RS_UNARY_OPERATOR,"!"),res.get(2));
         assertEquals(new Token(Token.Type.LS_UNARY_OPERATOR,"-"),res.get(3));
         assertEquals(new Token(Token.Type.BINARY_OPERATOR,"^"),res.get(4));
+
+    }
+
+    @Test
+    public void test8(){
+
+        List<Token> res = tokenizer.tokenize("2^-3!+sqrt(4)");
+        res = ShuntingYard.convertToRPN(res,informator);
+
+        assertNotNull(res);
+        assertEquals(8,res.size());
+
+        assertEquals(new Token(Token.Type.OPERAND,"2"),res.get(0));
+        assertEquals(new Token(Token.Type.OPERAND,"3"),res.get(1));
+        assertEquals(new Token(Token.Type.RS_UNARY_OPERATOR,"!"),res.get(2));
+        assertEquals(new Token(Token.Type.LS_UNARY_OPERATOR,"-"),res.get(3));
+        assertEquals(new Token(Token.Type.BINARY_OPERATOR,"^"),res.get(4));
+        assertEquals(new Token(Token.Type.OPERAND,"4"),res.get(5));
+        assertEquals(new Token(Token.Type.FUNCTION,"sqrt"),res.get(6));
+        assertEquals(new Token(Token.Type.BINARY_OPERATOR,"+"),res.get(7));
+
+    }
+
+    @Test
+    public void test9(){
+
+        List<Token> res = tokenizer.tokenize("max(1+3,4^2,5*6)");
+        res = ShuntingYard.convertToRPN(res,informator);
+
+        assertNotNull(res);
+        assertEquals(10,res.size());
+
+        assertEquals(new Token(Token.Type.OPERAND,"1"),res.get(0));
+        assertEquals(new Token(Token.Type.OPERAND,"3"),res.get(1));
+        assertEquals(new Token(Token.Type.BINARY_OPERATOR,"+"),res.get(2));
+
+        assertEquals(new Token(Token.Type.OPERAND,"4"),res.get(3));
+        assertEquals(new Token(Token.Type.OPERAND,"2"),res.get(4));
+        assertEquals(new Token(Token.Type.BINARY_OPERATOR,"^"),res.get(5));
+
+        assertEquals(new Token(Token.Type.OPERAND,"5"),res.get(6));
+        assertEquals(new Token(Token.Type.OPERAND,"6"),res.get(7));
+        assertEquals(new Token(Token.Type.BINARY_OPERATOR,"*"),res.get(8));
+
+        assertEquals(new Token(Token.Type.FUNCTION,"max"),res.get(9));
+
+        res.stream().forEach(System.out::println);
+    }
+
+    @Test
+    public void test10(){
+
+        List<Token> res = tokenizer.tokenize("max(sqrt(169),4^2,5*6)");
+        res = ShuntingYard.convertToRPN(res,informator);
+
+        assertNotNull(res);
+        assertEquals(9,res.size());
+
+        assertEquals(new Token(Token.Type.OPERAND,"169"),res.get(0));
+        assertEquals(new Token(Token.Type.FUNCTION,"sqrt"),res.get(1));
+
+        assertEquals(new Token(Token.Type.OPERAND,"4"),res.get(2));
+        assertEquals(new Token(Token.Type.OPERAND,"2"),res.get(3));
+        assertEquals(new Token(Token.Type.BINARY_OPERATOR,"^"),res.get(4));
+
+        assertEquals(new Token(Token.Type.OPERAND,"5"),res.get(5));
+        assertEquals(new Token(Token.Type.OPERAND,"6"),res.get(6));
+        assertEquals(new Token(Token.Type.BINARY_OPERATOR,"*"),res.get(7));
+
+        assertEquals(new Token(Token.Type.FUNCTION,"max"),res.get(8));
+
+        res.stream().forEach(System.out::println);
 
     }
 

@@ -10,7 +10,7 @@ import static edu.myrza.jmathexp.common.Token.*;
 
 public class Tokenizer{
 
-    private final Set<String> fLexemes;
+    private final Set<String> funcLexemes;
     private final Set<String> boLexemes;
     private final Set<String> rsoLexemes;
     private final Set<String> lsoLexemes;
@@ -18,7 +18,7 @@ public class Tokenizer{
 
     public Tokenizer(Informator informator){
 
-        fLexemes = informator.lexemesOf(Type.FUNCTION);
+        funcLexemes = informator.lexemesOf(Type.FUNCTION);
         boLexemes = informator.lexemesOf(Type.BINARY_OPERATOR);
         rsoLexemes = informator.lexemesOf(Type.RS_UNARY_OPERATOR);
         lsoLexemes = informator.lexemesOf(Type.LS_UNARY_OPERATOR);
@@ -31,13 +31,13 @@ public class Tokenizer{
         if(exp == null || exp.isEmpty())
             throw new IllegalArgumentException("the math expression can neither be null nor be empty string...");
 
-        LexicalAnalizer lex = new LexicalAnalizer(exp, fLexemes, rsoLexemes, lsoLexemes, boLexemes);
-        NeighborsMatcher nm = new NeighborsMatcher(exp, boLexemes,lex);
-        SyntaxAnalizer sa = new SyntaxAnalizer(exp,nm,informator);
+        LexicalAnalizer lex = new LexicalAnalizer(exp, funcLexemes, rsoLexemes, lsoLexemes, boLexemes);
+        NeighborsMatcher matcher = new NeighborsMatcher(exp, lex);
+        SyntaxAnalizer sAnalizer = new SyntaxAnalizer(exp,matcher,informator);
 
         List<Token> output = new ArrayList<>();
-        while (sa.hasNext())
-            output.add(sa.next());
+        while (sAnalizer.hasNext())
+            output.add(sAnalizer.next());
 
         return output;
 

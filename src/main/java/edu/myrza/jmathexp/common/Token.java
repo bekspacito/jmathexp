@@ -33,7 +33,6 @@ public class Token{
 
         }
 
-        //todo
         public int id(){
 
             switch (this){

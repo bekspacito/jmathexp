@@ -35,7 +35,7 @@ public interface Informator{
     /**
      * Returns a set of lexemesOf for a given lexeme type
      * e.g. for lexemesOf(Token.Type.BINARY_OPERATOR), the method will return all
-     * the available binary operator lexemesOf
+     * the binary operator lexemes
      * */
     Set<String> lexemesOf(Token.Type type);
 

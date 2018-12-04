@@ -18,7 +18,7 @@ class NeighborsMatcher{
     private Token lastProcessed;
     private static Map<Token.Type,List<Token.Type>> rightNeighboursAllowedTypes = new HashMap<>();
 
-    public NeighborsMatcher(String exp,Set<String> binOpNames,LexicalAnalizer lex){
+    public NeighborsMatcher(String exp,LexicalAnalizer lex){
         this.lex = lex;
         this.exp = exp;
         this.lastProcessed = new Token(Token.Type.START,"[");
@@ -48,6 +48,7 @@ class NeighborsMatcher{
 
     public Token next(){
 
+        //todo get rid of this if by making lexeme analizer return both START and END tokens
         if(lastProcessed.type == Token.Type.START)
             current = lex.next();
         next = lex.next();
@@ -80,7 +81,7 @@ class NeighborsMatcher{
         return null;
     }
 
-    //todo use this
+
     List<Token> findSuitableNeighbors(Token token,List<Token> candidates){
 
         //gets allowed types for t's right neighbor
@@ -101,7 +102,6 @@ class NeighborsMatcher{
         if(badNeighbor.type == Token.Type.END)
             throw new RuntimeException("The expression [" + exp + "] is unfinished...");
 
-        //todo handle TOKEN.Type.START being in output
         String tokenStr = output.stream().map(t -> "[" + t.lexeme + "]").collect(joining());
         int errorOccurencePosition = tokenStr.length() - output.size()*2;
 

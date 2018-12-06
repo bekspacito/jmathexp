@@ -29,6 +29,7 @@ public class ShuntingYard{
         for(Token current : infixRep)
             switch (current.type){
                 case OPERAND:
+                case VARIABLE:
                     output.add(current);
                     break;
 

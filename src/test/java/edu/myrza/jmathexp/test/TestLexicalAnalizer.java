@@ -40,11 +40,11 @@ public class TestLexicalAnalizer {
         binOpNames    = factory.getLexemes(ExpUnitType.BINARY_OPERATOR);
 
         rsOpNames = factory.getLexemes(ExpUnitType.UNARY_OPERATOR).stream()
-                .filter(eu -> factory.create(ExpUnitType.UNARY_OPERATOR,eu).isLeftAssociative())
+                .filter(eu -> factory.find(ExpUnitType.UNARY_OPERATOR,eu).isLeftAssociative())
                 .collect(toSet());
 
         lsOpNames = factory.getLexemes(ExpUnitType.UNARY_OPERATOR).stream()
-                .filter(eu -> !factory.create(ExpUnitType.UNARY_OPERATOR,eu).isLeftAssociative())
+                .filter(eu -> !factory.find(ExpUnitType.UNARY_OPERATOR,eu).isLeftAssociative())
                 .collect(toSet());
     }
 
@@ -52,7 +52,7 @@ public class TestLexicalAnalizer {
     public void test1(){
 
         String exp = "-3+4!";
-        List<List<Token>> result = getAllTheTokens(new LexicalAnalizer(exp,functions,rsOpNames,lsOpNames,binOpNames));
+        List<List<Token>> result = getAllTheTokens(new LexicalAnalizer(exp,null,functions,rsOpNames,lsOpNames,binOpNames));
 
         assertTrue(result.get(0).size() == 2);
         assertTrue(contains(result.get(0),new Token(Token.Type.LS_UNARY_OPERATOR,"-"),new Token(Token.Type.BINARY_OPERATOR,"-")));
@@ -75,7 +75,7 @@ public class TestLexicalAnalizer {
     public void test2(){
 
         String exp = "+--+2*4+-log(3)";
-        List<List<Token>> result = getAllTheTokens(new LexicalAnalizer(exp,functions,rsOpNames,lsOpNames,binOpNames));
+        List<List<Token>> result = getAllTheTokens(new LexicalAnalizer(exp,null,functions,rsOpNames,lsOpNames,binOpNames));
 
         assertTrue(result.get(0).size() == 2);
         assertTrue(contains(result.get(0),new Token(Token.Type.LS_UNARY_OPERATOR,"+"),new Token(Token.Type.BINARY_OPERATOR,"+")));
@@ -122,7 +122,7 @@ public class TestLexicalAnalizer {
     public void test3(){
 
         String exp = "2+3$$5"; // error $$ is an undefined operator
-        List<List<Token>> result = getAllTheTokens(new LexicalAnalizer(exp,functions,rsOpNames,lsOpNames,binOpNames));
+        List<List<Token>> result = getAllTheTokens(new LexicalAnalizer(exp,null,functions,rsOpNames,lsOpNames,binOpNames));
 
     }
 
@@ -130,7 +130,7 @@ public class TestLexicalAnalizer {
     public void test4(){
 
         String exp = "3+++++4";
-        List<List<Token>> result = getAllTheTokens(new LexicalAnalizer(exp,functions,rsOpNames,lsOpNames,binOpNames));
+        List<List<Token>> result = getAllTheTokens(new LexicalAnalizer(exp,null,functions,rsOpNames,lsOpNames,binOpNames));
 
         assertTrue(result.get(0).size() == 1);
         assertTrue(contains(result.get(0),new Token(Token.Type.OPERAND,"3")));

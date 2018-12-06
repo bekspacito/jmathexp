@@ -27,7 +27,7 @@ class NeighborsMatcher{
 
     static {
 
-        List<Token.Type> allowTypesSetOne = asList(Token.Type.OPERAND, Token.Type.LS_UNARY_OPERATOR, Token.Type.FUNCTION, Token.Type.OPEN_PARENTHESES);
+        List<Token.Type> allowTypesSetOne = asList(Token.Type.OPERAND, Token.Type.VARIABLE, Token.Type.LS_UNARY_OPERATOR, Token.Type.FUNCTION, Token.Type.OPEN_PARENTHESES);
         List<Token.Type> allowTypesSetTwo = asList(Token.Type.RS_UNARY_OPERATOR, Token.Type.BINARY_OPERATOR, Token.Type.CLOSE_PARENTHESES, Token.Type.FUNCTION_ARG_SEPARATOR, Token.Type.END);
 
         rightNeighboursAllowedTypes.put(Token.Type.START,                  allowTypesSetOne);
@@ -37,6 +37,7 @@ class NeighborsMatcher{
         rightNeighboursAllowedTypes.put(Token.Type.FUNCTION_ARG_SEPARATOR, allowTypesSetOne);
 
         rightNeighboursAllowedTypes.put(Token.Type.OPERAND,                allowTypesSetTwo);
+        rightNeighboursAllowedTypes.put(Token.Type.VARIABLE,               allowTypesSetTwo);
         rightNeighboursAllowedTypes.put(Token.Type.RS_UNARY_OPERATOR,      allowTypesSetTwo);
         rightNeighboursAllowedTypes.put(Token.Type.CLOSE_PARENTHESES,      allowTypesSetTwo);
 

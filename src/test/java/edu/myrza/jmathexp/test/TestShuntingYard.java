@@ -12,8 +12,7 @@ import edu.myrza.jmathexp.expression_unit.InformatorImpl;
 import edu.myrza.jmathexp.shuntingyard.ShuntingYard;
 import edu.myrza.jmathexp.tokenizer.Tokenizer;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 public class TestShuntingYard{
 
@@ -43,7 +42,7 @@ public class TestShuntingYard{
 
         informator =  new InformatorImpl(factory);
 
-        tokenizer = new Tokenizer(informator);
+        tokenizer = new Tokenizer(informator, null);
 
     }
 
@@ -232,6 +231,46 @@ public class TestShuntingYard{
         assertEquals(new Token(Token.Type.FUNCTION,"max"),res.get(8));
 
         res.stream().forEach(System.out::println);
+
+    }
+
+    @Test
+    public void test11(){
+
+        List<Token> res = tokenizer.tokenize("(-2)^3");
+        res = ShuntingYard.convertToRPN(res,informator);
+
+        assertNotNull(res);
+        assertEquals(4,res.size());
+
+        assertEquals(new Token(Token.Type.OPERAND,"2"),res.get(0));
+        assertEquals(new Token(Token.Type.LS_UNARY_OPERATOR,"-"),res.get(1));
+        assertEquals(new Token(Token.Type.OPERAND,"3"),res.get(2));
+        assertEquals(new Token(Token.Type.BINARY_OPERATOR,"^"),res.get(3));
+
+    }
+
+    @Test
+    public void test12(){
+
+        ExpressionUnitFactory factory = new ExpressionUnitFactoryImpl.Builder().build();
+        Informator informator =  new InformatorImpl(factory);
+
+        Map<String,Double> variables = new HashMap<>();
+        variables.put("x",3.1415);
+
+        Tokenizer tokenizer = new Tokenizer(informator, variables.keySet());
+
+
+        List<Token> res = tokenizer.tokenize("2*x");
+        res = ShuntingYard.convertToRPN(res,informator);
+
+        assertNotNull(res);
+        assertEquals(3,res.size());
+
+        assertEquals(new Token(Token.Type.OPERAND,"2"),res.get(0));
+        assertEquals(new Token(Token.Type.VARIABLE,"x"),res.get(1));
+        assertEquals(new Token(Token.Type.BINARY_OPERATOR,"*"),res.get(2));
 
     }
 

@@ -83,15 +83,14 @@ public class ExpressionUnitFactoryImpl implements ExpressionUnitFactory{
      * Both global and local functions/operators are merged here
      * */
     @Override
-    public ExpressionUnit create(ExpUnitType type, String id) {
+    public ExpressionUnit find(ExpUnitType type, String lexeme) {
 
         switch (type){
 
-            case FUNCTION        : return getExpressionUnit(id,customFunctions,       BuiltInFunctions::getFunction,      "no such function of id : " + id);
-            case UNARY_OPERATOR  : return getExpressionUnit(id,customUnaryOperators,  BuiltInOperators::getUnaryOperator, "no such unary operator of id : " + id);
-            case BINARY_OPERATOR : return getExpressionUnit(id,customBinaryOperators, BuiltInOperators::getBinaryOperator,"no such binary operator of id : " + id);
-            case OPERAND         :
-            default              : throw new IllegalArgumentException("cannot create an ExpressionUnit of given type : " + type);
+            case FUNCTION        : return getExpressionUnit(lexeme,customFunctions,       BuiltInFunctions::getFunction,      "no such function of lexeme : " + lexeme);
+            case UNARY_OPERATOR  : return getExpressionUnit(lexeme,customUnaryOperators,  BuiltInOperators::getUnaryOperator, "no such unary operator of lexeme : " + lexeme);
+            case BINARY_OPERATOR : return getExpressionUnit(lexeme,customBinaryOperators, BuiltInOperators::getBinaryOperator,"no such binary operator of lexeme : " + lexeme);
+            default              : throw new IllegalArgumentException("cannot find an ExpressionUnit of given type : " + type);
 
         }
     }
@@ -103,15 +102,15 @@ public class ExpressionUnitFactoryImpl implements ExpressionUnitFactory{
     public Set<String> getLexemes(ExpUnitType type) {
 
         switch (type){
-            case FUNCTION         : return getIds(customFunctions      , BuiltInFunctions::getFunctionNames);
-            case BINARY_OPERATOR  : return getIds(customBinaryOperators, BuiltInOperators::getBinaryOperatorNames);
-            case UNARY_OPERATOR   : return getIds(customUnaryOperators , BuiltInOperators::getUnaryOperatorNames);
+            case FUNCTION         : return getLexemes(customFunctions      , BuiltInFunctions::getFunctionNames);
+            case BINARY_OPERATOR  : return getLexemes(customBinaryOperators, BuiltInOperators::getBinaryOperatorNames);
+            case UNARY_OPERATOR   : return getLexemes(customUnaryOperators , BuiltInOperators::getUnaryOperatorNames);
             default               : throw new IllegalArgumentException("given Expression Unit type can't have any ids : " + type);
         }
 
     }
 
-    private ExpressionUnit getExpressionUnit(String id,
+    private ExpressionUnit getExpressionUnit(String lexeme,
                                              Map<String,? extends ExpressionUnit> customExpUnitsHolder,
                                              BuiltInExpUnitsHolder builtInExpUnitsHolder,
                                              String excMessage)
@@ -120,9 +119,9 @@ public class ExpressionUnitFactoryImpl implements ExpressionUnitFactory{
         ExpressionUnit reqExpUnit = null;
 
         if (customExpUnitsHolder != null)
-            reqExpUnit = customExpUnitsHolder.get(id);
+            reqExpUnit = customExpUnitsHolder.get(lexeme);
         if (reqExpUnit == null)
-            reqExpUnit = builtInExpUnitsHolder.getExpUnit(id);
+            reqExpUnit = builtInExpUnitsHolder.getExpUnit(lexeme);
         if (reqExpUnit == null)
             throw new IllegalArgumentException(excMessage);
 
@@ -130,17 +129,17 @@ public class ExpressionUnitFactoryImpl implements ExpressionUnitFactory{
 
     }
 
-    private Set<String> getIds(Map<String,? extends ExpressionUnit> customExpUnitsHolder,
-                               BuiltInExpUnitIdsHolder builtInExpUnitIdsHolder)
+    private Set<String> getLexemes(Map<String,? extends ExpressionUnit> customExpUnitsHolder,
+                                   BuiltInExpUnitLexemesHolder builtInExpUnitIdsHolder)
     {
 
-        Set<String> ids = new HashSet<>();
+        Set<String> lexemes = new HashSet<>();
 
         if(customExpUnitsHolder != null)
-            ids.addAll(customExpUnitsHolder.keySet());
-        ids.addAll(builtInExpUnitIdsHolder.getIds());
+            lexemes.addAll(customExpUnitsHolder.keySet());
+        lexemes.addAll(builtInExpUnitIdsHolder.getLexemes());
 
-        return ids;
+        return lexemes;
 
     }
 
@@ -148,7 +147,7 @@ public class ExpressionUnitFactoryImpl implements ExpressionUnitFactory{
         ExpressionUnit getExpUnit(String name);
     }
 
-    private interface BuiltInExpUnitIdsHolder{
-        Set<String> getIds();
+    private interface BuiltInExpUnitLexemesHolder {
+        Set<String> getLexemes();
     }
 }

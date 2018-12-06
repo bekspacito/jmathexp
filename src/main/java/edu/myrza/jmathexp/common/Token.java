@@ -11,6 +11,7 @@ public class Token{
             FUNCTION,
             FUNCTION_ARG_SEPARATOR,
             OPERAND,
+            VARIABLE,
             OPEN_PARENTHESES,
             CLOSE_PARENTHESES;
 
@@ -26,6 +27,7 @@ public class Token{
                 case FUNCTION_ARG_SEPARATOR:    return "FUNCTION_ARG_SEP";
                 case BINARY_OPERATOR:           return "BINARY_OPERATOR";
                 case OPERAND:                   return "OPERAND";
+                case VARIABLE:                  return "VARIABLE";
                 case OPEN_PARENTHESES:          return "OPEN_PARENTHESES";
                 case CLOSE_PARENTHESES:         return "CLOSE_PARENTHESES";
                 default :                       return null;
@@ -44,8 +46,9 @@ public class Token{
                 case FUNCTION_ARG_SEPARATOR:    return 5;
                 case BINARY_OPERATOR:           return 6;
                 case OPERAND:                   return 7;
-                case OPEN_PARENTHESES:          return 8;
-                case CLOSE_PARENTHESES:         return 9;
+                case VARIABLE:                  return 8;
+                case OPEN_PARENTHESES:          return 9;
+                case CLOSE_PARENTHESES:         return 10;
                 default :                       return -1;
             }
         }

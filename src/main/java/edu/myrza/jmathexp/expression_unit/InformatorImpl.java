@@ -26,7 +26,7 @@ public class InformatorImpl implements Informator{
         if(function.type != Token.Type.FUNCTION)
             throw new IllegalArgumentException("required : Token of Type FUNCTION\nfound : Token of Type " + function.type);
 
-        ExpressionUnit res = factory.create(ExpUnitType.FUNCTION,function.lexeme);
+        ExpressionUnit res = factory.find(ExpUnitType.FUNCTION,function.lexeme);
 
         return res.getArgc();
     }
@@ -40,9 +40,9 @@ public class InformatorImpl implements Informator{
             throw new IllegalArgumentException("required : Token of Type *_OPERATOR\nfound : Token of Type" + operator.type);
 
         if(operator.type == Token.Type.BINARY_OPERATOR)
-            return factory.create(ExpUnitType.BINARY_OPERATOR,operator.lexeme).isLeftAssociative();
+            return factory.find(ExpUnitType.BINARY_OPERATOR,operator.lexeme).isLeftAssociative();
         else
-            return factory.create(ExpUnitType.UNARY_OPERATOR,operator.lexeme).isLeftAssociative();
+            return factory.find(ExpUnitType.UNARY_OPERATOR,operator.lexeme).isLeftAssociative();
 
     }
 
@@ -55,9 +55,9 @@ public class InformatorImpl implements Informator{
             throw new IllegalArgumentException("required : Token of Type *_OPERATOR\nfound : Token of Type" + operator.type);
 
         if(operator.type == Token.Type.BINARY_OPERATOR)
-            return factory.create(ExpUnitType.BINARY_OPERATOR,operator.lexeme).getPrecedence();
+            return factory.find(ExpUnitType.BINARY_OPERATOR,operator.lexeme).getPrecedence();
         else
-            return factory.create(ExpUnitType.UNARY_OPERATOR,operator.lexeme).getPrecedence();
+            return factory.find(ExpUnitType.UNARY_OPERATOR,operator.lexeme).getPrecedence();
     }
 
     @Override
@@ -67,10 +67,10 @@ public class InformatorImpl implements Informator{
             case BINARY_OPERATOR   : return factory.getLexemes(ExpUnitType.BINARY_OPERATOR);
             case FUNCTION          : return factory.getLexemes(ExpUnitType.FUNCTION);
             case RS_UNARY_OPERATOR : return factory.getLexemes(ExpUnitType.UNARY_OPERATOR).stream()
-                                                    .filter(eu -> factory.create(ExpUnitType.UNARY_OPERATOR, eu).isLeftAssociative())
+                                                    .filter(eu -> factory.find(ExpUnitType.UNARY_OPERATOR, eu).isLeftAssociative())
                                                     .collect(toSet());
             case LS_UNARY_OPERATOR : return factory.getLexemes(ExpUnitType.UNARY_OPERATOR).stream()
-                                                    .filter(eu -> !factory.create(ExpUnitType.UNARY_OPERATOR, eu).isLeftAssociative())
+                                                    .filter(eu -> !factory.find(ExpUnitType.UNARY_OPERATOR, eu).isLeftAssociative())
                                                     .collect(toSet());
             default                : {
                 //todo it seems like we need some kind tokenFactory

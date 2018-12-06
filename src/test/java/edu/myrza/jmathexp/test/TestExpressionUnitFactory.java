@@ -19,7 +19,7 @@ public class TestExpressionUnitFactory{
                                                 .build();
 
 
-        ExpressionUnit log = factory.create(ExpUnitType.FUNCTION,"log");
+        ExpressionUnit log = factory.find(ExpUnitType.FUNCTION,"log");
         assertNotNull(log);
         assertEquals(4.0,log.evaluate(2,16),0.0);
 
@@ -39,7 +39,7 @@ public class TestExpressionUnitFactory{
                 })
                 .build();
 
-        ExpressionUnit bitwiseShift = factory.create(ExpUnitType.BINARY_OPERATOR,"<<");
+        ExpressionUnit bitwiseShift = factory.find(ExpUnitType.BINARY_OPERATOR,"<<");
         assertNotNull(bitwiseShift);
         assertEquals(1024.0,bitwiseShift.evaluate(512,1),0.01);
         assertEquals(2048.0,bitwiseShift.evaluate(512,2),0.01);
@@ -62,7 +62,7 @@ public class TestExpressionUnitFactory{
                   })
                   .build();
 
-        ExpressionUnit fact = factory.create(ExpUnitType.UNARY_OPERATOR,"!");
+        ExpressionUnit fact = factory.find(ExpUnitType.UNARY_OPERATOR,"!");
         assertNotNull(fact);
         assertEquals(120.0,fact.evaluate(5),0.001);
         assertEquals(3628800.0,fact.evaluate(10),0.001);
@@ -75,7 +75,7 @@ public class TestExpressionUnitFactory{
         ExpressionUnitFactory factory = new ExpressionUnitFactoryImpl.Builder()
                                                                      .build();
 
-        ExpressionUnit sqrt = factory.create(ExpUnitType.FUNCTION,"sqrt");
+        ExpressionUnit sqrt = factory.find(ExpUnitType.FUNCTION,"sqrt");
         assertNotNull(sqrt);
         assertEquals(8.0,sqrt.evaluate(64),0.0001);
 

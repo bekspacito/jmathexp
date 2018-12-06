@@ -32,7 +32,7 @@ public class TokenizerTest {
 
         Informator informator = new InformatorImpl(factory);
 
-        tokenizer = new Tokenizer(informator);
+        tokenizer = new Tokenizer(informator,null);
     }
 
     @Test

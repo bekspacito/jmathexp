@@ -1,5 +1,6 @@
 package edu.myrza.jmathexp.tokenizer;
 
+import edu.myrza.jmathexp.common.Informator;
 import edu.myrza.jmathexp.common.Token;
 
 import java.util.*;
@@ -18,8 +19,9 @@ class NeighborsMatcher{
     private Token lastProcessed;
     private static Map<Token.Type,List<Token.Type>> rightNeighboursAllowedTypes = new HashMap<>();
 
-    public NeighborsMatcher(String exp,LexicalAnalizer lex){
-        this.lex = lex;
+    public NeighborsMatcher(String exp,Informator informator,Set<String> variables){
+
+        this.lex = new LexicalAnalizer(exp,variables,informator);
         this.exp = exp;
         this.lastProcessed = new Token(Token.Type.START,"[");
         output = new ArrayList<>();

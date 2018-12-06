@@ -205,7 +205,6 @@ public class TestShuntingYard{
 
         assertEquals(new Token(Token.Type.FUNCTION,"max"),res.get(9));
 
-        res.stream().forEach(System.out::println);
     }
 
     @Test
@@ -230,7 +229,6 @@ public class TestShuntingYard{
 
         assertEquals(new Token(Token.Type.FUNCTION,"max"),res.get(8));
 
-        res.stream().forEach(System.out::println);
 
     }
 

@@ -1,6 +1,7 @@
 package edu.myrza.jmathexp.tokenizer;
 
 import com.sun.istack.internal.Nullable;
+import edu.myrza.jmathexp.common.Informator;
 import edu.myrza.jmathexp.common.Token;
 
 import java.util.*;
@@ -10,7 +11,7 @@ import static java.util.Arrays.asList;
 import static java.util.Comparator.comparingInt;
 import static java.util.stream.Collectors.toList;
 
-public class LexicalAnalizer{
+class LexicalAnalizer{
 
         private Scanner scanner;
         private int pointer;
@@ -26,11 +27,16 @@ public class LexicalAnalizer{
 
         public LexicalAnalizer(String exp,
                                @Nullable Set<String> variables,
-                               Set<String> functions,
-                               Set<String> rsOperators,
-                               Set<String> lsOperators,
-                               Set<String> binaryOperators)
+                               Informator informator)
         {
+
+            if(exp == null || exp.isEmpty())
+                throw new IllegalArgumentException("math expression cannot be null nor empty...");
+
+            Set<String> functions       = informator.lexemesOf(Token.Type.FUNCTION);
+            Set<String> rsOperators     = informator.lexemesOf(Token.Type.RS_UNARY_OPERATOR);
+            Set<String> lsOperators     = informator.lexemesOf(Token.Type.LS_UNARY_OPERATOR);
+            Set<String> binaryOperators = informator.lexemesOf(Token.Type.BINARY_OPERATOR);
 
             this.exp = exp.replaceAll("\\s+","") + "]";
             scanner = new Scanner(this.exp);

@@ -5,7 +5,7 @@ import edu.myrza.jmathexp.common.Token;
 
 import java.util.*;
 
-public class SyntaxAnalizer{
+class SyntaxAnalizer{
 
     private List<Token> processedTokens;
     private Stack<Integer> parenthesesStack;
@@ -15,8 +15,9 @@ public class SyntaxAnalizer{
     private String exp;
 
 
-    public SyntaxAnalizer(String exp,NeighborsMatcher neighborsMatcher, Informator informator){
-        this.neighborsMatcher = neighborsMatcher;
+    public SyntaxAnalizer(String exp,Informator informator,Set<String> variables){
+
+        this.neighborsMatcher = new NeighborsMatcher(exp,informator,variables);
         this.informator = informator;
         this.exp = exp;
 

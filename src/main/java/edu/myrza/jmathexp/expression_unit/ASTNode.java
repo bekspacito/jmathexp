@@ -18,9 +18,10 @@ public class ASTNode{
      * todo : this method seems counter-intuitive
      * do somethinf about it...
      * */
-    public void addChild(ASTNode child){
-        if(children == null) children = new ArrayList<>();
-        children.add(child);
+    public void addArg(int argNum,ASTNode arg){
+        if(children == null)
+            children = new ArrayList<>(eu.getArgc());
+        children.add(argNum,arg);
     }
 
 
@@ -31,8 +32,8 @@ public class ASTNode{
     public double evaluate(){
         if(children != null) {
             double[] args = children.stream()
-                    .mapToDouble(ASTNode::evaluate)
-                    .toArray();
+                                    .mapToDouble(ASTNode::evaluate)
+                                    .toArray();
 
             return eu.evaluate(args);
         }else

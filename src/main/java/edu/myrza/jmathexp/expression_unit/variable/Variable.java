@@ -5,10 +5,11 @@ import edu.myrza.jmathexp.expression_unit.ExpressionUnit;
 
 import java.util.Map;
 
+
 public class Variable implements ExpressionUnit{
 
-    private String variable;
-    private Map<String,Double> varValues;
+    private final String variable;
+    private double value;
 
     private static ExpUnitType type;
 
@@ -16,13 +17,17 @@ public class Variable implements ExpressionUnit{
         type = ExpUnitType.VARIABLE;
     }
 
-    public Variable(String variable,Map<String,Double> varValues){
+    public Variable(String variable,double value){
         this.variable = variable;
-        this.varValues = varValues;
+        this.value = value;
+    }
+
+    public void update(double newValue){
+        this.value = newValue;
     }
 
     public double evaluate(double ... args) {
-        return varValues.get(variable);
+        return value;
     }
 
     public int getArgc() {

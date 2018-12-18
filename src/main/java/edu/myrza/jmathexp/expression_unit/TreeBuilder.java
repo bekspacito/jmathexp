@@ -1,11 +1,25 @@
 package edu.myrza.jmathexp.expression_unit;
 
+import edu.myrza.jmathexp.common.Token;
+import edu.myrza.jmathexp.expression_unit.operand.Operand;
+import edu.myrza.jmathexp.expression_unit.variable.Variable;
+
 import java.util.List;
+import java.util.Map;
 import java.util.Stack;
+
+import static java.util.stream.Collectors.toList;
 
 public class TreeBuilder{
 
-    public static ASTNode build(List<ASTNode> rpnNodes){
+    /**
+     * Builds math expression tree out of given tokens.
+     * */
+    public static ASTNode build(List<Token> rpnTokens,
+                                ExpressionUnitFactory factory,
+                                Map<String,Variable> variables){
+
+        List<ASTNode> rpnNodes = convert(rpnTokens,factory,variables);
 
         Stack<ASTNode> stack = new Stack<>();
 
@@ -22,18 +36,47 @@ public class TreeBuilder{
                 case BINARY_OPERATOR    : argc = 2; break;
             }
 
-            ASTNode[] children = new ASTNode[argc];
+            ASTNode[] arg = new ASTNode[argc];
 
             for(int i  = argc - 1;i >= 0; i--)
-                children[i] = stack.pop();
+                arg[i] = stack.pop();
 
             for(int i = 0;i < argc; i++)
-                node.addChild(children[i]);
+                node.addArg(i,arg[i]);
 
             stack.push(node);
         }
 
         return stack.pop();
+    }
+
+    /**
+     * Converts Tokens into ASTNodes
+     * */
+    public static List<ASTNode> convert(List<Token> rpnTokens,
+                                        ExpressionUnitFactory factory,
+                                        Map<String,Variable> variables)
+    {
+
+        return rpnTokens.stream()
+                .map(token -> {
+                    switch (token.type){
+                        case VARIABLE :
+                            return new ASTNode(variables.get(token.lexeme));
+                        case OPERAND  :
+                            return new ASTNode(new Operand(Double.parseDouble(token.lexeme)));
+                        case LS_UNARY_OPERATOR:
+                        case RS_UNARY_OPERATOR:
+                            return new ASTNode(factory.find(ExpUnitType.UNARY_OPERATOR,token.lexeme));
+                        case BINARY_OPERATOR:
+                            return new ASTNode(factory.find(ExpUnitType.BINARY_OPERATOR,token.lexeme));
+                        case FUNCTION:
+                            return new ASTNode(factory.find(ExpUnitType.FUNCTION,token.lexeme));
+                        default:
+                            throw new IllegalArgumentException("This token isn't supposed to be here : " + token);
+                    }
+                }).collect(toList());
+
     }
 
 }

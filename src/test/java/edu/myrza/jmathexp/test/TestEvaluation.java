@@ -1,13 +1,8 @@
 package edu.myrza.jmathexp.test;
 
-import edu.myrza.jmathexp.common.Informator;
-import edu.myrza.jmathexp.common.Token;
 import edu.myrza.jmathexp.expression_unit.*;
-import edu.myrza.jmathexp.shuntingyard.ShuntingYard;
-import edu.myrza.jmathexp.tokenizer.Tokenizer;
 import org.junit.Test;
 
-import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -23,7 +18,10 @@ public class TestEvaluation {
     @Test
     public void test2(){
 
-        assertEquals(1.0,evaluate("sin(3/2)*sin(3/2) + cos(3/2)*cos(3/2)"),0.0001);
+        Expression expression = new Expression.Builder("sin(3/2)^2 + cos(3/2)^2")
+                                               .build();
+
+        assertEquals(1.0,expression.evaluate(),0.0001);
 
     }
 
@@ -48,37 +46,81 @@ public class TestEvaluation {
 
     }
 
+    @Test
+    public void  test5(){
+
+        Expression expression = new Expression.Builder("2*x")
+                                                .setVariable("x",2d)
+                                                .build();
+
+        assertEquals(4.0,expression.evaluate(),0);
+
+    }
+
+    @Test
+    public void test6(){
+
+        Expression expression = new Expression.Builder("-3*x + 4!/y + log(2,64)")
+                                                .setVariable("x",15)
+                                                .setVariable("y",4)
+                                                .setFunction("log",2,args -> {
+                                                        return Math.log(args[1])/Math.log(args[0]);
+                                                    }
+                                                ).setUnaryOperator("!",
+                                                            true,
+                                                                BuiltInOperators.POWER_PRECEDENCE + 1,
+                                                                    argDouble -> {
+                                                                        final int arg = (int) argDouble;
+                                                                        if ((double) arg != argDouble) {
+                                                                            throw new IllegalArgumentException("Operand for factorial has to be an integer");
+                                                                        }
+                                                                        if (arg < 0) {
+                                                                            throw new IllegalArgumentException("The operand of the factorial can not be less than zero");
+                                                                        }
+                                                                        double result = 1;
+                                                                        for (int i = 1; i <= arg; i++) {
+                                                                            result *= i;
+                                                                        }
+                                                                        return result;
+
+                                                                    }
+                                                ).build();
+
+        assertEquals(-33.0,expression.evaluate(),0.001);
+
+        expression.changeExistVarsValue("x",3);
+        expression.changeExistVarsValue("y",10);
+
+        assertEquals(-0.6,expression.evaluate(),0.001);
+
+    }
+
     private static double evaluate(String exp){
 
-        ExpressionUnitFactory factory = new ExpressionUnitFactoryImpl.Builder()
-                .addUnaryOperator("!",true,BuiltInOperators.POWER_PRECEDENCE + 1,argDouble -> {
+        return new Expression.Builder(exp)
+                                .setUnaryOperator("!",
+                                        true,
+                                        BuiltInOperators.POWER_PRECEDENCE + 1,
+                                        argDouble -> {
 
-                    final int arg = (int) argDouble;
-                    if ((double) arg != argDouble) {
-                        throw new IllegalArgumentException("Operand for factorial has to be an integer");
-                    }
-                    if (arg < 0) {
-                        throw new IllegalArgumentException("The operand of the factorial can not be less than zero");
-                    }
-                    double result = 1;
-                    for (int i = 1; i <= arg; i++) {
-                        result *= i;
-                    }
-                    return result;
-
-                }).build();
-        Informator informator =  new InformatorImpl(factory);
-
-        Tokenizer tokenizer = new Tokenizer(informator, null);
+                                            final int arg = (int) argDouble;
+                                            if ((double) arg != argDouble) {
+                                                throw new IllegalArgumentException("Operand for factorial has to be an integer");
+                                            }
+                                            if (arg < 0) {
+                                                throw new IllegalArgumentException("The operand of the factorial can not be less than zero");
+                                            }
+                                            double result = 1;
+                                            for (int i = 1; i <= arg; i++) {
+                                                result *= i;
+                                            }
+                                            return result;
 
 
-        List<Token> res = tokenizer.tokenize(exp);
-        res = ShuntingYard.convertToRPN(res,informator);
-        List<ASTNode> nodes = TokenASTNodeConverter.convert(res,factory,null);
-        ASTNode otvet = TreeBuilder.build(nodes);
+                                        })
+                                .build()
+                                .evaluate();
 
-        System.out.println(otvet.evaluate());
-        return otvet.evaluate();
 
     }
 

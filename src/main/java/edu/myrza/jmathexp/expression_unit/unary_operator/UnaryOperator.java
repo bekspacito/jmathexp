@@ -1,20 +1,16 @@
 package edu.myrza.jmathexp.expression_unit.unary_operator;
 
-import edu.myrza.jmathexp.expression_unit.ExpUnitType;
-import edu.myrza.jmathexp.expression_unit.ExpressionUnit;
 
-public class UnaryOperator implements ExpressionUnit {
+public class UnaryOperator {
 
     private UnaryOperatorsBody impl;
     private int precedence;
     private String lexeme;
     private boolean isLeftAssociative;
 
-    private static ExpUnitType type;
     private static int argc;
 
     static {
-        type = ExpUnitType.UNARY_OPERATOR;
         argc = 1;
     }
 
@@ -48,8 +44,8 @@ public class UnaryOperator implements ExpressionUnit {
         return precedence;
     }
 
-    public ExpUnitType getType(){
-        return type;
+    public String getLexeme() {
+        return lexeme;
     }
 
     @Override

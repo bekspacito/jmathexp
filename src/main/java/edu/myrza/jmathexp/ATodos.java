@@ -1,5 +1,3 @@
-//todo handle variables' evaluation and change. Check if everything around variables makes sense
-
 //todo check if TokenASTNodeConverter can throw NullPointerException if @param variables is null
 
 //todo variables and function names could match - deal with it
@@ -11,3 +9,5 @@
 //todo add space character support
 
 //todo restrict an amount of symbols operators can consist of
+
+//todo check correct working of every object inside tokenizer package

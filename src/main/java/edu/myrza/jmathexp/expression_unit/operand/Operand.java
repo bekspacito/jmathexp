@@ -1,39 +1,16 @@
 package edu.myrza.jmathexp.expression_unit.operand;
 
-import edu.myrza.jmathexp.expression_unit.ExpUnitType;
-import edu.myrza.jmathexp.expression_unit.ExpressionUnit;
 
-public class Operand implements ExpressionUnit {
+public class Operand {
 
     private double value;
-
-    private static ExpUnitType type;
-
-    static {
-        type = ExpUnitType.OPERAND;
-    }
 
     public Operand(double value){
         this.value = value;
     }
 
-    public double evaluate(double ... args) {
+    public double getValue(){
         return value;
     }
 
-    public int getArgc() {
-        throw new UnsupportedOperationException("operands have no args...");
-    }
-
-    public boolean isLeftAssociative() {
-        throw new UnsupportedOperationException("operands have no association...");
-    }
-
-    public int getPrecedence() {
-        throw new UnsupportedOperationException("operands don't have precedence....");
-    }
-
-    public ExpUnitType getType() {
-        return type;
-    }
 }

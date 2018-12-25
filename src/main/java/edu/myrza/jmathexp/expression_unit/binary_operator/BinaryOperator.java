@@ -1,21 +1,16 @@
 package edu.myrza.jmathexp.expression_unit.binary_operator;
 
-import edu.myrza.jmathexp.expression_unit.ExpUnitType;
-import edu.myrza.jmathexp.expression_unit.ExpressionUnit;
 
-public class BinaryOperator implements ExpressionUnit {
+public class BinaryOperator{
 
     private BinaryOperatorsBody impl;
     private int precedence;
     private String lexeme;
     private boolean isLeftAssociative;
 
-    private static ExpUnitType type;
-
     private static int argc;
 
     static {
-        type = ExpUnitType.BINARY_OPERATOR;
         argc = 2;
     }
 
@@ -49,8 +44,8 @@ public class BinaryOperator implements ExpressionUnit {
         return precedence;
     }
 
-    public ExpUnitType getType(){
-        return type;
+    public String getLexeme() {
+        return lexeme;
     }
 
     @Override

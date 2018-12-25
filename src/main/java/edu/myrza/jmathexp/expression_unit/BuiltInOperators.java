@@ -6,6 +6,7 @@ import edu.myrza.jmathexp.expression_unit.unary_operator.UnaryOperator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Stream;
 
 public class BuiltInOperators {
 
@@ -21,8 +22,8 @@ public class BuiltInOperators {
 
     public static final int POWER_PRECEDENCE = 10000;
 
-    private static Map<String,ExpressionUnit> globalBinaryOperators = new HashMap<>();
-    private static Map<String,ExpressionUnit> globalUnaryOperators  = new HashMap<>();
+    private static Map<String,BinaryOperator> globalBinaryOperators = new HashMap<>();
+    private static Map<String,UnaryOperator> globalUnaryOperators  = new HashMap<>();
 
     static {
 
@@ -39,18 +40,26 @@ public class BuiltInOperators {
         globalUnaryOperators.put("+",new UnaryOperator("+",false,UNARY_PLUS_PRECEDENCE, operand -> operand < 0 ? -1*operand : operand));
     }
 
-    public static ExpressionUnit getBinaryOperator(String name){
+    static BinaryOperator getBinaryOperator(String name){
         return globalBinaryOperators.get(name);
     }
 
-    public static ExpressionUnit getUnaryOperator(String name){
+    static UnaryOperator getUnaryOperator(String name){
         return globalUnaryOperators.get(name);
     }
 
-    public static Set<String> getBinaryOperatorNames(){
+    static Stream<BinaryOperator> getBinaryOperators(){
+        return globalBinaryOperators.values().stream();
+    }
+
+    static Stream<UnaryOperator> getUnaryOperators(){
+        return globalUnaryOperators.values().stream();
+    }
+
+    static Set<String> getBinaryOperatorNames(){
         return globalBinaryOperators.keySet();
     }
 
-    public static Set<String> getUnaryOperatorNames(){ return globalUnaryOperators.keySet(); }
+    static Set<String> getUnaryOperatorNames(){ return globalUnaryOperators.keySet(); }
 
 }

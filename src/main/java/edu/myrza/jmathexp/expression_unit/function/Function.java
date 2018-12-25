@@ -1,19 +1,11 @@
 package edu.myrza.jmathexp.expression_unit.function;
 
-import edu.myrza.jmathexp.expression_unit.ExpUnitType;
-import edu.myrza.jmathexp.expression_unit.ExpressionUnit;
-
-public class Function implements ExpressionUnit {
+public class Function{
 
     private FunctionsBody impl;
     private String lexeme;
     private int argc;
 
-    private static ExpUnitType type;
-
-    static {
-        type = ExpUnitType.FUNCTION;
-    }
 
     public Function(String lexeme, int argc, FunctionsBody impl){
 
@@ -36,16 +28,8 @@ public class Function implements ExpressionUnit {
         return argc;
     }
 
-    public boolean isLeftAssociative(){
-        throw new UnsupportedOperationException("functions don't have associations : " + toString());
-    }
-
-    public int getPrecedence(){
-        throw new UnsupportedOperationException("functions don't have precedence : " + toString());
-    }
-
-    public ExpUnitType getType(){
-        return type;
+    public String getLexeme() {
+         return lexeme;
     }
 
     @Override

@@ -1,8 +1,6 @@
 package edu.myrza.jmathexp.test;
 
 import edu.myrza.jmathexp.common.Informator;
-import edu.myrza.jmathexp.expression_unit.ExpressionUnitFactory;
-import edu.myrza.jmathexp.expression_unit.ExpressionUnitFactoryImpl;
 import edu.myrza.jmathexp.common.Token;
 import edu.myrza.jmathexp.expression_unit.InformatorImpl;
 import edu.myrza.jmathexp.tokenizer.Tokenizer;
@@ -21,16 +19,7 @@ public class TokenizerTest {
 
     public TokenizerTest(){
 
-        ExpressionUnitFactory factory = new ExpressionUnitFactoryImpl.Builder()
-                                                                     .addUnaryOperator("!",true,POWER_PRECEDENCE + 1,arg -> {
-                                                                         int intArg = (int)arg;
-                                                                         return IntStream.rangeClosed(1,intArg)
-                                                                                         .reduce((i,j) -> i*j)
-                                                                                         .getAsInt();
-                                                                     })
-                                                                     .build();
-
-        Informator informator = new InformatorImpl(factory);
+        Informator informator = new InformatorImpl(null,null,null);
 
         tokenizer = new Tokenizer(informator,null);
     }

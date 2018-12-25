@@ -2,23 +2,30 @@ package edu.myrza.jmathexp.expression_unit;
 
 import edu.myrza.jmathexp.common.Informator;
 import edu.myrza.jmathexp.common.Token;
+import edu.myrza.jmathexp.expression_unit.binary_operator.BinaryOperator;
 import edu.myrza.jmathexp.expression_unit.binary_operator.BinaryOperatorsBody;
+import edu.myrza.jmathexp.expression_unit.exp_tree_node.ExpTreeNode;
+import edu.myrza.jmathexp.expression_unit.function.Function;
 import edu.myrza.jmathexp.expression_unit.function.FunctionsBody;
+import edu.myrza.jmathexp.expression_unit.unary_operator.UnaryOperator;
 import edu.myrza.jmathexp.expression_unit.unary_operator.UnaryOperatorsBody;
 import edu.myrza.jmathexp.expression_unit.variable.Variable;
 import edu.myrza.jmathexp.shuntingyard.ShuntingYard;
 import edu.myrza.jmathexp.tokenizer.Tokenizer;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class Expression{
 
-    private final ASTNode root;
+    private final ExpTreeNode root;
     private final Map<String,Variable> variables;
 
-    private Expression(ASTNode root,Map<String,Variable> variables){
+    private Expression(ExpTreeNode root,
+                       Map<String,Variable> variables){
+
         this.root = root;
         this.variables = variables;
     }
@@ -35,10 +42,16 @@ public class Expression{
 
         private String expression;
         private Map<String,Variable> variables;
-        private ExpressionUnitFactoryImpl.Builder factoryBuilder = new ExpressionUnitFactoryImpl.Builder();
+        private List<Function> functions;
+        private List<BinaryOperator> binaryOperators;
+        private List<UnaryOperator> unaryOperators;
+
 
         public Builder(String expression){
             this.expression = expression;
+            this.functions = new ArrayList<>();
+            this.binaryOperators = new ArrayList<>();
+            this.unaryOperators = new ArrayList<>();
         }
 
         public Builder setBinaryOperator(String lexeme,
@@ -46,7 +59,7 @@ public class Expression{
                                          int precedence,
                                          BinaryOperatorsBody body){
 
-            factoryBuilder.addBinaryOperator(lexeme,isLeftAssociative,precedence,body);
+            binaryOperators.add(new BinaryOperator(lexeme,isLeftAssociative,precedence,body));
             return this;
         }
 
@@ -55,7 +68,7 @@ public class Expression{
                                          int precedence,
                                          UnaryOperatorsBody body){
 
-            factoryBuilder.addUnaryOperator(lexeme,isLeftAssociative,precedence,body);
+            unaryOperators.add(new UnaryOperator(lexeme,isLeftAssociative,precedence,body));
             return this;
         }
 
@@ -63,7 +76,7 @@ public class Expression{
                                         int argc,
                                         FunctionsBody body){
 
-            factoryBuilder.addFunction(lexeme,argc,body);
+            functions.add(new Function(lexeme,argc,body));
             return this;
         }
 
@@ -77,15 +90,14 @@ public class Expression{
 
         public Expression build(){
 
-            ExpressionUnitFactory factory = factoryBuilder.build();
-            Informator informator =  new InformatorImpl(factory);
+            Informator informator = new InformatorImpl(functions,binaryOperators,unaryOperators);
 
             List<Token> tokens    = new Tokenizer(informator, variables == null ? null : variables.keySet())
                                             .tokenize(expression);
 
             List<Token> rpnTokens = ShuntingYard.convertToRPN(tokens,informator);
 
-            ASTNode root = TreeBuilder.build(rpnTokens,factory,variables);
+            ExpTreeNode root = TreeBuilder.build(rpnTokens,functions,binaryOperators,unaryOperators,variables);
 
             return new Expression(root,variables);
 

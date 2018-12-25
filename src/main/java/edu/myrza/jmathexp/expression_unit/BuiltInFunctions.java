@@ -5,10 +5,11 @@ import edu.myrza.jmathexp.expression_unit.function.Function;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Stream;
 
 public class BuiltInFunctions {
 
-    private static Map<String,ExpressionUnit> globalFunctions = new HashMap<>();
+    private static Map<String,Function> globalFunctions = new HashMap<>();
 
     static {
 
@@ -27,9 +28,9 @@ public class BuiltInFunctions {
         globalFunctions.put("cos",new Function("cos",1, args -> Math.cos(args[0])));
     }
 
-    public static ExpressionUnit getFunction(String name){
-        return globalFunctions.get(name);
-    }
+    public static Function getFunction(String name){ return globalFunctions.get(name); }
+
+    public static Stream<Function> getFunctions(){ return globalFunctions.values().stream(); }
 
     public static Set<String> getFunctionNames(){
         return globalFunctions.keySet();

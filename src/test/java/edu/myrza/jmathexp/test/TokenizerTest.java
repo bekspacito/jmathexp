@@ -2,11 +2,14 @@ package edu.myrza.jmathexp.test;
 
 import edu.myrza.jmathexp.common.Informator;
 import edu.myrza.jmathexp.common.Token;
+import edu.myrza.jmathexp.expression_unit.BuiltInOperators;
 import edu.myrza.jmathexp.expression_unit.InformatorImpl;
+import edu.myrza.jmathexp.expression_unit.unary_operator.UnaryOperator;
 import edu.myrza.jmathexp.tokenizer.Tokenizer;
 
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
 
@@ -19,7 +22,9 @@ public class TokenizerTest {
 
     public TokenizerTest(){
 
-        Informator informator = new InformatorImpl(null,null,null);
+        List<UnaryOperator> unaryOperators = new ArrayList<>();
+        unaryOperators.add(new UnaryOperator("!",true, BuiltInOperators.POWER_PRECEDENCE + 1, arg -> arg + 1));
+        Informator informator = new InformatorImpl(null,null,unaryOperators);
 
         tokenizer = new Tokenizer(informator,null);
     }

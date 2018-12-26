@@ -7,7 +7,6 @@ import java.util.*;
 
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.*;
-import static java.util.Comparator.*;
 
 class NeighborsMatcher{
 
@@ -56,7 +55,7 @@ class NeighborsMatcher{
             current = lex.next();
         next = lex.next();
 
-        Token result = findSuitableCurrent(lastProcessed,current,next);
+        Token result = findCurrent(lastProcessed,current,next);
 
         output.add(result);
         lastProcessed = result;
@@ -64,28 +63,39 @@ class NeighborsMatcher{
         return result;
     }
 
-    Token findSuitableCurrent(Token lastProcessed,
-                              List<Token> currents,
-                              List<Token> currentRightNeighborCandidates)
+    Token findCurrent(Token lastProcessed,
+                      List<Token> currents,
+                      List<Token> nextCurrents)
     {
 
-        List<Token> currentCandidates = findSuitableNeighbors(lastProcessed,currents);
+        //phase 1 start
+        List<Token> currentCandidates = findNeighbors(lastProcessed,currents);
 
-        if(currentCandidates.size() <= 0)
-            handleNoSuitableNeighbors(lastProcessed,currentRightNeighborCandidates.get(0));
+        if(currentCandidates.size() == 0)
+            handleNoSuitableNeighbors(lastProcessed,currents.get(0));
+        if(currentCandidates.size() == 1)
+            return currentCandidates.get(0);
+        //phase 1 end
+
+        //phase 2 start
+        List<Token.Type> boSet = rightNeighboursAllowedTypes.get(Token.Type.BINARY_OPERATOR);
+        Token.Type currsType; //future current's type
+
+        if(nextCurrents.size() == 1 &&
+                boSet.contains(nextCurrents.get(0).type))
+            currsType = Token.Type.BINARY_OPERATOR;
         else
-            currentCandidates.sort(comparingInt(t -> t.type.id()));
+            currsType = Token.Type.RS_UNARY_OPERATOR;
 
-        for(Token t : currentCandidates)
-            if(findSuitableNeighbors(t,currentRightNeighborCandidates).size() > 0)
-                return t;
-
-        handleNoSuitableNeighbors(currentCandidates.get(0),currentRightNeighborCandidates.get(0));
-        return null;
+        return currentCandidates.stream()
+                    .filter(t -> t.type == currsType)
+                    .findFirst()
+                    .get();
+        //phase 2 end
     }
 
 
-    List<Token> findSuitableNeighbors(Token token,List<Token> candidates){
+    List<Token> findNeighbors(Token token, List<Token> candidates){
 
         //gets allowed types for t's right neighbor
         List<Token.Type> allowedTypes = rightNeighboursAllowedTypes.get(token.type);

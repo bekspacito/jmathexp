@@ -1,6 +1,5 @@
 package edu.myrza.jmathexp.tokenizer;
 
-import com.sun.istack.internal.Nullable;
 import edu.myrza.jmathexp.common.Informator;
 import edu.myrza.jmathexp.common.Token;
 
@@ -26,7 +25,7 @@ class LexicalAnalizer{
         private List<Token>  reserveSymbols;
 
         public LexicalAnalizer(String exp,
-                               @Nullable Set<String> variables,
+                               Set<String> variables,
                                Informator informator)
         {
 

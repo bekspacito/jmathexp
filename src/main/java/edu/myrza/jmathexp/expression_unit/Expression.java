@@ -52,6 +52,9 @@ public class Expression{
             this.functions = new ArrayList<>();
             this.binaryOperators = new ArrayList<>();
             this.unaryOperators = new ArrayList<>();
+            this.variables = new HashMap<>();
+            variables.put("pi",new Variable("pi",3.14159265359));
+            variables.put("e" ,new Variable("e",2.71828182846));
         }
 
         public Builder setBinaryOperator(String lexeme,
@@ -75,16 +78,28 @@ public class Expression{
         public Builder setFunction(String lexeme,
                                         int argc,
                                         FunctionsBody body){
+            variables.keySet().stream()
+                      .filter(varLex -> lexeme.equals(varLex))
+                      .findAny()
+                      .ifPresent(lex -> {
+                          throw new IllegalArgumentException("variable's lexeme cannot match with any of function's lexemes : " + lex);
+                      });
 
             functions.add(new Function(lexeme,argc,body));
             return this;
         }
 
-        public Builder setVariable(String var,double initialValue){
-            if(variables == null)
-                variables = new HashMap<>();
+        public Builder setVariable(String varLexeme,double initialValue){
 
-            variables.put(var,new Variable(var,initialValue));
+            functions.stream()
+                     .map(Function::getLexeme)
+                     .filter(lex -> lex.equals(varLexeme))
+                     .findAny()
+                     .ifPresent(lex -> {
+                         throw new IllegalArgumentException("variable's lexeme cannot match with any of function's lexemes : " + lex);
+                     });
+
+            variables.put(varLexeme,new Variable(varLexeme,initialValue));
             return this;
         }
 
@@ -92,7 +107,7 @@ public class Expression{
 
             Informator informator = new InformatorImpl(functions,binaryOperators,unaryOperators);
 
-            List<Token> tokens    = new Tokenizer(informator, variables == null ? null : variables.keySet())
+            List<Token> tokens    = new Tokenizer(informator,variables.keySet())
                                             .tokenize(expression);
 
             List<Token> rpnTokens = ShuntingYard.convertToRPN(tokens,informator);

@@ -95,6 +95,24 @@ public class TestEvaluation {
 
     }
 
+    @Test
+    public void test7(){
+
+        assertEquals(-12.0,evaluate("-5+-7"),0.001);
+        assertEquals(-2.0,evaluate("5+-7"),0.001);
+        assertEquals(2.0,evaluate("-5--7"),0.001);
+        assertEquals(2.0,evaluate("-5-(-7)"),0.001);
+        assertEquals(35.0,evaluate("-5*-7"),0.001);
+        assertEquals(0.0,evaluate("0/-7"),0.001);
+    }
+
+    @Test
+    public void test8(){
+
+        assertEquals(1.0,evaluate("sin(pi/2)"),0);
+
+    }
+
     private static double evaluate(String exp){
 
         return new Expression.Builder(exp)

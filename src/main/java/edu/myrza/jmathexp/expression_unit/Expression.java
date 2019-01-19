@@ -108,7 +108,7 @@ public class Expression{
             Informator informator = new InformatorImpl(functions,binaryOperators,unaryOperators);
 
             List<Token> tokens    = new Tokenizer(informator,variables.keySet())
-                                            .tokenize(expression);
+                                                    .tokenize(expression);
 
             List<Token> rpnTokens = ShuntingYard.convertToRPN(tokens,informator);
 

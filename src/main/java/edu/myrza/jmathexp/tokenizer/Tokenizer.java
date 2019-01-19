@@ -29,6 +29,7 @@ public class Tokenizer{
         while (sAnalizer.hasNext())
             output.add(sAnalizer.next());
 
+        sAnalizer.close();
         return output;
 
     }

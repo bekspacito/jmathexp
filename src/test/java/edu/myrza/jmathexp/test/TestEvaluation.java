@@ -53,7 +53,6 @@ public class TestEvaluation {
                                                 .setVariable("x",2d)
                                                 .build();
 
-        assertEquals(4.0,expression.evaluate(),0);
 
     }
 

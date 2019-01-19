@@ -13,7 +13,7 @@ import static java.util.stream.Collectors.toList;
 class LexicalAnalizer{
 
         private Scanner scanner;
-        private int pointer;
+        private int frontierCharIndex;
         private String exp;
         private List<String> functions;
         private Set<String> rsOperators;
@@ -39,13 +39,13 @@ class LexicalAnalizer{
 
             this.exp = exp.replaceAll("\\s+","") + "]";
             scanner = new Scanner(this.exp);
-            pointer = 0;
+            frontierCharIndex = 0;
 
             this.binaryOperators = binaryOperators;
             this.rsOperators = rsOperators;
             this.lsOperators = lsOperators;
 
-            //we sorted an operators and functions by length scanner order to apply LONGEST MATCHING RULE
+            //we sort operators and functions by length to apply LONGEST MATCHING RULE
             this.functions = functions.stream()
                                         .sorted(comparingInt(String::length).reversed())
                                         .collect(toList());
@@ -68,44 +68,44 @@ class LexicalAnalizer{
 
         }
 
-        public boolean hasNext(){ return pointer < exp.length(); }
+        public boolean hasNext(){ return frontierCharIndex < exp.length(); }
 
         public List<Token> next(){
 
-            if(pointer >= exp.length())
+            if(frontierCharIndex >= exp.length())
                 throw new NoSuchElementException("no tokens left....");
 
             List<Token> result = new ArrayList<>();
             String nextTokenStr = null;
 
             //is operand
-            if(Character.isDigit(exp.charAt(pointer))) {
+            if(Character.isDigit(exp.charAt(frontierCharIndex))) {
                 nextTokenStr = scanner.findInLine("([0-9]+(\\.[0-9]+)?|\\.[0-9]+)");
-                pointer += nextTokenStr.length();
+                frontierCharIndex += nextTokenStr.length();
                 result.add(new Token(Token.Type.OPERAND,nextTokenStr));
                 return result;
             }
 
-            if(Character.isLetter(exp.charAt(pointer))) {
+            if(Character.isLetter(exp.charAt(frontierCharIndex))) {
                 Optional<String> nextToken = findFunction();
                 if(nextToken.isPresent()) {
-                    pointer += nextToken.get().length();
+                    frontierCharIndex += nextToken.get().length();
                     result.add(new Token(Token.Type.FUNCTION, nextToken.get()));
                     return result;
                 }
 
                 nextToken = findVariable();
                 if(nextToken.isPresent()){
-                    pointer += nextToken.get().length();
+                    frontierCharIndex += nextToken.get().length();
                     result.add(new Token(Token.Type.VARIABLE, nextToken.get()));
                     return result;
                 }
             }
 
-            //is findOperator
+            //is operator
             Optional<String> res = findOperator();
             if(res.isPresent()) {
-                pointer += res.get().length();
+                frontierCharIndex += res.get().length();
                 return getMatchedTokens(res.get());
             }
 
@@ -116,12 +116,12 @@ class LexicalAnalizer{
                     .findFirst();
 
             if(resToken.isPresent()){
-                pointer += resToken.get().lexeme.length();
+                frontierCharIndex += resToken.get().lexeme.length();
                 result.add(resToken.get());
                 return result;
             }
 
-            throw new RuntimeException("An unknown token appeared ,starting at position : " + ++pointer);
+            throw new NoSuchLexemeException(exp,frontierCharIndex);
 
         }
 
@@ -163,7 +163,7 @@ class LexicalAnalizer{
             return Optional.empty();
         }
 
-        public void finalize(){
+        public void close(){
             scanner.close();
         }
 

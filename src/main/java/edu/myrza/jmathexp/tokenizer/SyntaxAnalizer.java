@@ -127,4 +127,8 @@ class SyntaxAnalizer{
         throw new RuntimeException(message);
     }
 
+    public void close(){
+        neighborsMatcher.close();
+    }
+
 }

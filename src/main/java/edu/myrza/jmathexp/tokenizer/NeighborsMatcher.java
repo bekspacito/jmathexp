@@ -126,5 +126,9 @@ class NeighborsMatcher{
 
     }
 
+    public void close(){
+        lex.close();
+    }
+
 
 }

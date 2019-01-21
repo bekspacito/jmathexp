@@ -8,7 +8,7 @@ import java.util.*;
 class SyntaxAnalizer{
 
     private List<Token> processedTokens;
-    private Stack<Integer> parenthesesStack;
+    private Stack<Integer> parenthesesStack; //contains how many arg. separators are expected
     private boolean ignoreNextOpenParentheses;
     private NeighborsMatcher neighborsMatcher;
     private Informator informator;
@@ -94,7 +94,7 @@ class SyntaxAnalizer{
     private void checkCloseParentheses(Token closeParentheses){
 
         if(parenthesesStack.empty())
-            throw new RuntimeException("the amount of ) exceeded the amount of ( ...");
+            throwMisplacedLexemeExcp(closeParentheses);
 
         int argc = parenthesesStack.pop();
 
@@ -103,28 +103,40 @@ class SyntaxAnalizer{
     }
 
     private void checkArgSep(Token argumentSep){
-        if(parenthesesStack.empty()){
-           throw new RuntimeException("arg sep isn't supposed to be here....");
-        }//todo change exception!!!
+        if(parenthesesStack.empty() || parenthesesStack.peek() == 0)
+            throwMisplacedLexemeExcp(argumentSep);
+
         parenthesesStack.push(parenthesesStack.pop() - 1);
     }
 
     private void throwWrongAmountOfArgsException(){
 
-        List<Token> temp = new ArrayList<>(processedTokens);
-        int lastFunctionIndex = 0;
+        int l1 = processedTokens.stream()
+                                 .mapToInt(t -> t.lexeme.length())
+                                 .sum();
 
-        Collections.reverse(temp);
-        Token lastFunction = temp.stream().filter(t -> t.type == Token.Type.FUNCTION)
-                                          .findFirst()
-                                          .get();
+        Collections.reverse(processedTokens);
 
+        Token function = processedTokens.stream().filter(t -> t.type == Token.Type.FUNCTION)
+                                        .findFirst()
+                                        .get();
+
+        int l2 = 0;
         for(Token t : processedTokens)
-            if(!t.equals(lastFunction)) lastFunctionIndex += t.lexeme.length();
+            if(!t.equals(function)) l2 += t.lexeme.length();
             else break;
 
-        String message = "\nWrong amount of arguments have been set to a function " + lastFunction.lexeme + " at position " + ++lastFunctionIndex;
-        throw new RuntimeException(message);
+        l2 = l2 + function.lexeme.length();
+
+        throw new WrongFunArgException(l1 - l2,function,exp);
+    }
+
+    private void throwMisplacedLexemeExcp(Token mispToken){
+        int position = processedTokens.stream()
+                .mapToInt(t -> t.lexeme.length())
+                .sum();
+
+        throw new MisplacedLexemeException(position,mispToken,exp);
     }
 
     public void close(){

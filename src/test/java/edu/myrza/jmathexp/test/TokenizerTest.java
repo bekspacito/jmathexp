@@ -4,11 +4,13 @@ import edu.myrza.jmathexp.common.Informator;
 import edu.myrza.jmathexp.common.Token;
 import edu.myrza.jmathexp.expression_unit.BuiltInOperators;
 import edu.myrza.jmathexp.expression_unit.InformatorImpl;
+import edu.myrza.jmathexp.expression_unit.function.Function;
 import edu.myrza.jmathexp.expression_unit.unary_operator.UnaryOperator;
 import edu.myrza.jmathexp.tokenizer.NoSuchLexemeException;
 import edu.myrza.jmathexp.tokenizer.NoSuitableNeighborsException;
 import edu.myrza.jmathexp.tokenizer.Tokenizer;
 
+import edu.myrza.jmathexp.tokenizer.WrongFunArgException;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -23,8 +25,14 @@ public class TokenizerTest {
     public TokenizerTest(){
 
         List<UnaryOperator> unaryOperators = new ArrayList<>();
+        List<Function> functions = new ArrayList<>();
         unaryOperators.add(new UnaryOperator("!",true, BuiltInOperators.POWER_PRECEDENCE + 1, arg -> arg + 1));
-        Informator informator = new InformatorImpl(null,null,unaryOperators);
+
+        functions.add(new Function("func",4,args ->
+                                                args[0] + args[1] + args[2] + args[3]
+                                        ));
+
+        Informator informator = new InformatorImpl(functions,null,unaryOperators);
 
         tokenizer = new Tokenizer(informator,null);
     }
@@ -253,10 +261,10 @@ public class TokenizerTest {
 
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test(expected = WrongFunArgException.class)
     public void test14(){
 
-        String exp = "19+log(4,3)";
+        String exp = "19+func(2,3,4,5)+func(3)+func(1,1,1,1)";
 
         List<Token> res = tokenizer.tokenize(exp);
     }

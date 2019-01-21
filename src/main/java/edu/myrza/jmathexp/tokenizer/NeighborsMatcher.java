@@ -72,12 +72,12 @@ class NeighborsMatcher{
         List<Token> currentCandidates = findNeighbors(lastProcessed,currents);
 
         if(currentCandidates.size() == 0)
-            handleNoSuitableNeighbors(lastProcessed,currents.get(0));
+            throw new NoSuitableNeighborsException(lastProcessed,currents.get(0),output,exp);
         if(currentCandidates.size() == 1)
             return currentCandidates.get(0);
         //phase 1 end
 
-        //phase 2 start
+        //phase 2 start ( current candidates are [RSO|BO] case )
         List<Token.Type> boSet = rightNeighboursAllowedTypes.get(Token.Type.BINARY_OPERATOR);
         Token.Type currsType; //future current's type
 
@@ -105,26 +105,6 @@ class NeighborsMatcher{
                          .collect(toList());
     }
 
-
-
-    private void handleNoSuitableNeighbors(Token current , Token badNeighbor){
-
-        if(current.type == Token.Type.START)
-            throw new RuntimeException("Token [" + badNeighbor.lexeme + "] cannot be at the start....");
-
-        if(badNeighbor.type == Token.Type.END)
-            throw new RuntimeException("The expression [" + exp + "] is unfinished...");
-
-        String tokenStr = output.stream().map(t -> "[" + t.lexeme + "]").collect(joining());
-        int errorOccurencePosition = tokenStr.length() - output.size()*2;
-
-        String message = "At position " + errorOccurencePosition + "\n" +
-                         "These two tokens : [" + current.lexeme + "][" + badNeighbor.lexeme + "] cannot be neighbors....\n" +
-                         "prev. tokens : " + tokenStr;
-
-        throw new RuntimeException(message);
-
-    }
 
     public void close(){
         lex.close();

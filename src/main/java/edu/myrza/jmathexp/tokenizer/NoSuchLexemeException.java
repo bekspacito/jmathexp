@@ -6,8 +6,8 @@ public class NoSuchLexemeException extends RuntimeException {
     private String exp;
 
     public NoSuchLexemeException(String exp, int unkLexStartIndex){
-        super("An unknown lexeme appeared in [" + exp + "]" +
-                "\nthe lexeme starts at position : " + unkLexStartIndex);
+        super("\nAn unknown lexeme appeared in [" + exp +
+                "\nthe unknown lexeme starts at position : " + (unkLexStartIndex + 1));
         this.unkLexStartIndex = unkLexStartIndex;
         this.exp = exp;
     }

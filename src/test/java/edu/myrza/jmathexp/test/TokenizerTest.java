@@ -5,16 +5,16 @@ import edu.myrza.jmathexp.common.Token;
 import edu.myrza.jmathexp.expression_unit.BuiltInOperators;
 import edu.myrza.jmathexp.expression_unit.InformatorImpl;
 import edu.myrza.jmathexp.expression_unit.unary_operator.UnaryOperator;
+import edu.myrza.jmathexp.tokenizer.NoSuchLexemeException;
+import edu.myrza.jmathexp.tokenizer.NoSuitableNeighborsException;
 import edu.myrza.jmathexp.tokenizer.Tokenizer;
 
 import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.IntStream;
 
 import static org.junit.Assert.*;
-import static edu.myrza.jmathexp.expression_unit.BuiltInOperators.*;
 
 public class TokenizerTest {
 
@@ -235,7 +235,7 @@ public class TokenizerTest {
 
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test(expected = NoSuitableNeighborsException.class)
     public void test12(){
 
         String exp = "19!!!!!!19";
@@ -244,7 +244,7 @@ public class TokenizerTest {
 
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test(expected = NoSuchLexemeException.class)
     public void test13(){
 
         String exp = "19!!!!!$19";

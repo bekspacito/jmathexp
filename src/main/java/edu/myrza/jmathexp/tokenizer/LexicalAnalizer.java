@@ -132,11 +132,12 @@ class LexicalAnalizer{
             if(lsOperators.stream().anyMatch(str -> str.equals(nextTokenStr)))
                 result.add(new Token(Token.Type.LS_UNARY_OPERATOR,nextTokenStr));
 
+            if(rsOperators.stream().anyMatch(str -> str.equals(nextTokenStr)))
+                result.add(new Token(Token.Type.RS_UNARY_OPERATOR,nextTokenStr));
+
             if(binaryOperators.stream().anyMatch(str -> str.equals(nextTokenStr)))
                 result.add(new Token(Token.Type.BINARY_OPERATOR,nextTokenStr));
 
-            if(rsOperators.stream().anyMatch(str -> str.equals(nextTokenStr)))
-                result.add(new Token(Token.Type.RS_UNARY_OPERATOR,nextTokenStr));
 
             return result;
         }

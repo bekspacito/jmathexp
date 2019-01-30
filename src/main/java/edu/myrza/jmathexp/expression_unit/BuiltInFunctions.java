@@ -15,13 +15,36 @@ public class BuiltInFunctions {
 
         globalFunctions.put("abs",new Function("abs",1, args -> Math.abs(args[0])));
 
-        globalFunctions.put("sqrt",new Function("sqrt",1, args -> Math.sqrt(args[0])));
+        globalFunctions.put("sqrt",new Function("sqrt",1, args -> {
 
-        globalFunctions.put("log",new Function("log",1, args -> Math.log(args[0])));
+           if(args[0] <= 0d)
+               throw new IllegalArgumentException("The argument of sqrt has to be positive...");
 
-        globalFunctions.put("log10",new Function("log10",1, args -> Math.log10(args[0])));
+           return Math.sqrt(args[0]);
 
-        globalFunctions.put("log2",new Function("log2",1, args -> Math.log(args[0])/Math.log(2)));
+        }));
+
+        globalFunctions.put("log",new Function("log",1, args -> {
+
+            if(args[0] <= 0d)
+                throw new IllegalArgumentException("The argument of log has to be positive...");
+
+            return Math.log(args[0]);
+        }));
+
+        globalFunctions.put("log10",new Function("log10",1, args -> {
+
+            if(args[0] <= 0d)
+                throw new IllegalArgumentException("The argument of log10 has to be positive...");
+
+            return Math.log10(args[0]);
+        }));
+
+        globalFunctions.put("log2",new Function("log2",1, args -> {
+            if(args[0] <= 0d)
+                throw new IllegalArgumentException("The argument of log10 has to be positive...");
+            return Math.log(args[0])/Math.log(2);
+        }));
 
         globalFunctions.put("sin",new Function("sin",1, args -> Math.sin(args[0])));
 

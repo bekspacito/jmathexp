@@ -35,23 +35,6 @@ public class Token{
 
         }
 
-        public int id(){
-
-            switch (this){
-                case START :                    return 0;
-                case END   :                    return 1;
-                case RS_UNARY_OPERATOR:         return 2;
-                case LS_UNARY_OPERATOR:         return 3;
-                case FUNCTION:                  return 4;
-                case FUNCTION_ARG_SEPARATOR:    return 5;
-                case BINARY_OPERATOR:           return 6;
-                case OPERAND:                   return 7;
-                case VARIABLE:                  return 8;
-                case OPEN_PARENTHESES:          return 9;
-                case CLOSE_PARENTHESES:         return 10;
-                default :                       return -1;
-            }
-        }
     }
 
     public final Type type;

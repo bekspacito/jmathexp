@@ -31,8 +31,20 @@ public class BuiltInOperators {
         globalBinaryOperators.put("-",new BinaryOperator("-",true, SUBTRACTION_PRECEDENCE,(operand1, operand2) -> operand1 - operand2 ));
 
         globalBinaryOperators.put("*",new BinaryOperator("*",true,MULTIPLICATION_PRECEDENCE,(operand1, operand2) -> operand1 * operand2 ));
-        globalBinaryOperators.put("/",new BinaryOperator("/",true,DIVISION_PRECEDENCE,(operand1, operand2) -> operand1 / operand2 ));
-        globalBinaryOperators.put("%",new BinaryOperator("%",true,MODULO_PRECEDENCE,(operand1, operand2) -> operand1 % operand2 ));
+
+        globalBinaryOperators.put("/",new BinaryOperator("/",true,DIVISION_PRECEDENCE,(operand1, operand2) -> {
+            if(operand2 == 0d)
+                throw new ArithmeticException("Division by zero....");
+
+            return operand1 / operand2;
+        }));
+
+        globalBinaryOperators.put("%",new BinaryOperator("%",true,MODULO_PRECEDENCE,(operand1, operand2) -> {
+            if(operand2 == 0d)
+                throw new ArithmeticException("Modulo by zero....");
+
+            return operand1 % operand2;
+        }));
 
         globalBinaryOperators.put("^",new BinaryOperator("^",false,POWER_PRECEDENCE,Math::pow));
 

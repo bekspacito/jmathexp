@@ -112,6 +112,13 @@ public class TestEvaluation {
 
     }
 
+    @Test(expected = ArithmeticException.class)
+    public void test9(){
+        evaluate("1/0");
+    }
+
+
+
     private static double evaluate(String exp){
 
         return new Expression.Builder(exp)
